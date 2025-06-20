@@ -16,8 +16,8 @@ list_of_files = [
     
 
     f"Data/__init__.py",
-    f"Data/raw_data/zip_files",
-    f"Data/raw_data/extracted_files",
+    f"Data/raw_data/zip_files/__init__.py",
+    f"Data/raw_data/extracted_files/__init__.py",
     f"Data/data.db",
     f"Data/raw_data/__init__.py",
     f"Data/processed_data/__init__.py",

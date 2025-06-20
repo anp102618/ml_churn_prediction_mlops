@@ -1,0 +1,9 @@
+DataIngestion:
+  path:
+    db_path: Data/data.db
+    raw_data_dir: Data/raw_data
+    extracted_data_dir: Data/raw_data/extracted_files
+    zip_path: Data/raw_data/zip_files/bank_churners.zip
+
+  const:
+
