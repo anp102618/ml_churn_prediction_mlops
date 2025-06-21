@@ -1,9 +1,14 @@
 DataIngestion:
   path:
     db_path: Data/data.db
-    raw_data_dir: Data/raw_data
     extracted_data_dir: Data/raw_data/extracted_files
     zip_path: Data/raw_data/zip_files/bank_churners.zip
 
   const:
 
+DataValidation:
+  path:
+    schema_config_path: Config_Yaml/schema.yaml
+    raw_df_path: Data/raw_data/extracted_files/bank_churners.csv
+
+  const:

@@ -9,6 +9,7 @@ from Common_Utils import CustomException, track_performance, setup_logger,load_y
 # Setup logger
 logger = setup_logger(filename="logs")
 config = load_yaml("Config_Yaml/config_path.yaml")
+schema_config = load_yaml("Config_Yaml/schema.yaml")
 
 
 """
@@ -18,7 +19,6 @@ zip_path (Path): path to store downloaded zip.
 """
 db_path: Path = Path(config["DataIngestion"]["path"]["db_path"])
 extracted_data_dir: Path = Path(config["DataIngestion"]["path"]["extracted_data_dir"])
-raw_data_dir: Path = Path(config["DataIngestion"]["path"]["raw_data_dir"])
 zip_path: Path = Path(config["DataIngestion"]["path"]["zip_path"])
 
 
@@ -35,38 +35,14 @@ class DataIngestion:
         Args:
             
             db_path (str): SQLite DB path.
-            raw_data_dir (str): Directory to store raw CSV.
+            extracted_data_dir (str): Directory to store raw CSV.
             zip_dir (str): Directory to store downloaded zip.
            
         """
         self.db_path = db_path
-        self.raw_data_dir = raw_data_dir
         self.zip_path = zip_path
         self.extracted_data_dir = extracted_data_dir
 
-        os.makedirs(raw_data_dir, exist_ok=True)
-        os.makedirs(extracted_data_dir, exist_ok=True)
-        os.makedirs(zip_path, exist_ok=True)
-        
-
-    def save_raw_csv(self, df: pd.DataFrame) -> str:
-        """
-        Saves DataFrame as a CSV in the raw_data folder.
-
-        Args:
-            df (pd.DataFrame): The DataFrame to save.
-
-        Returns:
-            str: Path to the saved file.
-        """
-        try:
-            file_name = f"bank_churners.csv"
-            path = os.path.join(self.raw_data_dir, file_name)
-            df.to_csv(path, index=False)
-            logger.info(f"Saved raw data to: {path}")
-        except Exception as e:
-            logger.error("Failed to save raw CSV.")
-            raise CustomException(e, sys)
 
     def upload_to_db(self, df: pd.DataFrame, table_name: str = "raw_data"):
         """
@@ -99,27 +75,36 @@ class DataIngestion:
     @track_performance
     def ingest(self):
         """
-        Full ingestion pipeline: download, extract, read, save to DB and CSV.
+        Full ingestion pipeline: download, extract, filter columns by schema, save to DB and CSV.
         """
         try:
             # Step 1: Read dataset using FileReaderManager
             logger.info("Starting data ingestion...")
             df = FileReaderManager.load_dataset(self.zip_path, self.extracted_data_dir)
-
+            print(df.columns)
             if df.empty:
                 raise ValueError("Loaded DataFrame is empty.")
 
-            # Step 2: Save locally to raw_data/
-            self.save_raw_csv(df)
+            # Step 2: Load schema.yaml and filter columns
+            expected_columns = list(schema_config["columns"].keys())
+            logger.info(f"Filtering DataFrame columns to match schema: {expected_columns}")
+            
+            df_filtered = df[expected_columns]
 
-            # Step 3: Upload to SQLite
-            self.upload_to_db(df)
+            # Step 3: Save cleaned CSV to extracted_data_dir as 'bank_churners.csv'
+            output_csv_path = self.extracted_data_dir / "bank_churners.csv"
+            df_filtered.to_csv(output_csv_path, index=False)
+            logger.info(f"Filtered DataFrame saved to: {output_csv_path}")
+
+            # Step 4: Upload to SQLite
+            self.upload_to_db(df_filtered)
 
             logger.info("Data ingestion completed successfully.")
 
         except Exception as e:
             logger.error(f"Data ingestion failed: {e}")
             raise CustomException(e, sys)
+
 
 @track_performance
 def execute_data_ingestion():

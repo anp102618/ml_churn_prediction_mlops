@@ -27,6 +27,7 @@ list_of_files = [
     f"Config_Yaml/__init__.py",
     f"Config_Yaml/config_path.yaml",
     f"Config_Yaml/classifiers.yaml",
+    f"Config_Yaml/schema.yaml",
 
     f"Model_Utils/__init__.py",
     f"Model_Utils/feature_nan_imputation.py",
@@ -41,7 +42,6 @@ list_of_files = [
     f"src/__init__.py",
     f"src/Data_Ingestion.py",
     f"src/Data_Validation.py",
-    f"src/Data_Preprocessing.py",
     f"src/Data_Transformation.py",
     f"src/Model_tune_evaluate.py",
     f"src/Experiment_Tracking_Prediction.py",

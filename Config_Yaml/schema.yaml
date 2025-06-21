@@ -1,0 +1,22 @@
+columns:
+  CLIENTNUM: int64
+  Attrition_Flag: category
+  Customer_Age: int64
+  Gender: category
+  Dependent_count: int64
+  Education_Level: category
+  Marital_Status: category
+  Income_Category: category
+  Card_Category: category
+  Months_on_book: int64
+  Total_Relationship_Count: int64
+  Months_Inactive_12_mon: int64
+  Contacts_Count_12_mon: int64
+  Credit_Limit: float64
+  Total_Revolving_Bal: float64
+  Avg_Open_To_Buy: float64
+  Total_Amt_Chng_Q4_Q1: float64
+  Total_Trans_Amt: int64
+  Total_Trans_Ct: int64
+  Total_Ct_Chng_Q4_Q1: float64
+  Avg_Utilization_Ratio: float64

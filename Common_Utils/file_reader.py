@@ -39,7 +39,7 @@ class CSVReader(FileReaderStrategy):
 
     def read(self, file_path: str) -> pd.DataFrame:
         try:
-            return pd.read_csv(file_path, index_col=0)
+            return pd.read_csv(file_path)
         except Exception as e:
             logger.error(f"Failed to read CSV: {file_path} | {e}")
             raise CustomException(e, sys)
@@ -163,14 +163,14 @@ class FileReaderManager:
     @staticmethod
     def extract_zip(zip_path: str, extract_dir: str) -> str:
         """
-        Extracts a zip file and returns the path to the first supported file.
+        Extracts a zip file and renames the first supported file to 'bank_churners.csv'.
 
         Args:
             zip_path (str): Path to zip.
             extract_dir (str): Where to extract.
 
         Returns:
-            str: Path to first supported file.
+            str: Path to renamed extracted file ('bank_churners.csv').
 
         Raises:
             FileNotFoundError: If no readable file is found.
@@ -178,6 +178,7 @@ class FileReaderManager:
         try:
             os.makedirs(extract_dir, exist_ok=True)
             logger.info(f"Extracting zip file: {zip_path}")
+            
             with zipfile.ZipFile(zip_path, 'r') as zip_ref:
                 zip_ref.extractall(extract_dir)
 
@@ -185,9 +186,16 @@ class FileReaderManager:
                 for file in files:
                     ext = Path(file).suffix.lower()
                     if ext in FileReaderFactory.registry:
-                        file_path = os.path.join(root, file)
-                        logger.info(f"Found readable file: {file_path}")
-                        return file_path
+                        original_path = os.path.join(root, file)
+                        renamed_path = os.path.join(extract_dir, "bank_churners.csv")
+                        
+                        # If a file with this name already exists, remove it to avoid overwrite issues
+                        if os.path.exists(renamed_path):
+                            os.remove(renamed_path)
+
+                        os.rename(original_path, renamed_path)
+                        logger.info(f"Renamed file to: {renamed_path}")
+                        return renamed_path
 
             raise FileNotFoundError("No supported file found in extracted contents.")
 

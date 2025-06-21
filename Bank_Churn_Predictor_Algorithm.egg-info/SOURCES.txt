@@ -12,6 +12,8 @@ Config_Yaml/__init__.py
 Data/__init__.py
 Data/processed_data/__init__.py
 Data/raw_data/__init__.py
+Data/raw_data/extracted_files/__init__.py
+Data/raw_data/zip_files/__init__.py
 Model_Utils/__init__.py
 Model_Utils/classsification_models.py
 Model_Utils/feature_encoding.py
@@ -24,7 +26,6 @@ Test_Script/__init__.py
 Test_Script/test_model_promotion.py
 Tuned_Model/__init__.py
 src/Data_Ingestion.py
-src/Data_Preprocessing.py
 src/Data_Transformation.py
 src/Data_Validation.py
 src/Experiment_Tracking_Prediction.py
