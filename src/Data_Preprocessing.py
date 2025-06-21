@@ -183,8 +183,9 @@ def execute_data_preprocessing() -> None:
         CustomException: If preprocessing or saving fails.
     """
     try:
-        db_context = SQLiteStrategy()
-        df: pd.DataFrame = db_context.read_table_from_db(sqlite_path, table_name)
+        db_context = SQLiteStrategy(db_path=sqlite_path)
+        query = f"SELECT * FROM {table_name}"
+        df: pd.DataFrame = db_context.read_query(query=query)
 
         context = PreprocessingContext(df)
         context.add_step(RemoveDuplicatesStrategy())
@@ -211,7 +212,7 @@ def execute_data_preprocessing() -> None:
 
         encoding_transformer = ColumnTransformer([
             ('ord', OrdinalEncoder(categories=[categories[col] for col in ordinal_cols]), ordinal_cols),
-            ('ohe', OneHotEncoder(sparse=False, handle_unknown='ignore'), ohe_cols)
+            ('ohe', OneHotEncoder(sparse_output=False, handle_unknown='ignore'), ohe_cols)
         ], remainder='passthrough')
 
         scaler = ScalerFactory.get_scaler(scaler_type)

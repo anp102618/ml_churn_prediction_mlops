@@ -1,0 +1,9 @@
+[2025-06-21 12:23:33,096] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-21 12:23:33,096] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-21 12:23:33,096] 100 __init__.py - INFO - Running 'execute_data_preprocessing'...
+[2025-06-21 12:23:33,096] 36 sqlite_handler.py - INFO - Connected to SQLite DB at Data\data.db
+[2025-06-21 12:23:33,237] 96 sqlite_handler.py - INFO - Executed read query. Rows fetched: 10127
+[2025-06-21 12:23:33,487] 229 Data_Preprocessing.py - INFO - Saved encoder_scaler.pkl successfully.
+[2025-06-21 12:23:34,232] 238 Data_Preprocessing.py - INFO - Preprocessing and saving completed successfully.
+[2025-06-21 12:23:34,268] 111 __init__.py - INFO - 'execute_data_preprocessing' completed in 1.1724 sec
+[2025-06-21 12:23:34,269] 112 __init__.py - INFO - Memory used: 699.55 KB (peak: 34789.05 KB)
