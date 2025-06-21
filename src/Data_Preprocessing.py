@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 import joblib
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import List, Optional, Union
 from pathlib import Path
 from sklearn.model_selection import train_test_split
 from sklearn.compose import ColumnTransformer
@@ -29,7 +29,6 @@ output_dir: Path = Path(config["Data_Preprocessing"]["path"]["processed_output_d
 output_dir.mkdir(exist_ok=True)
 target_column: str = config["Data_Preprocessing"]["const"]["target_column"]
 imputation_method: str = config["Data_Preprocessing"]["const"]["imputation_method"]
-#categorical_imputation_method: str = config["Data_Preprocessing"]["const"]["categorical_imputation_method"]
 outlier_method: str = config["Data_Preprocessing"]["const"]["outlier_method"]
 iqr_threshold: float = config["Data_Preprocessing"]["const"]["iqr_threshold"]
 scaler_type: str = config["Data_Preprocessing"]["const"].get("scaler", "standard")
@@ -93,37 +92,42 @@ class ImputeMissingValuesStrategy(PreprocessingStrategy):
             pd.DataFrame: Imputed DataFrame.
     """
     def __init__(self, method: str):
-        self.method = method
         self.numeric_imputer = ImputerFactory.get_imputer(method)
-        self.categorical_imputer = SimpleImputer(strategy='most_frequent')
-        self.numeric_cols = None
-        self.categorical_cols = None
+        self.cat_imputer = SimpleImputer(strategy="most_frequent")
+        self.numeric_cols = []
+        self.cat_cols = []
 
-    def fit(self, df: pd.DataFrame):
-        self.numeric_cols = df.select_dtypes(include='number').columns
-        self.categorical_cols = df.select_dtypes(include='object').columns
+    def fit_transform(self, df: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
+        if isinstance(df, pd.Series):
+            df_2d = df.to_frame()
+            result = self.cat_imputer.fit_transform(df_2d)
+            return pd.Series(result.ravel(), name=df.name, index=df.index)
 
-        if len(self.numeric_cols) > 0:
-            self.numeric_imputer.fit(df[self.numeric_cols])
-        if len(self.categorical_cols) > 0:
-            self.categorical_imputer.fit(df[self.categorical_cols])
+        # DataFrame
+        self.numeric_cols = df.select_dtypes(include='number').columns.tolist()
+        self.cat_cols = df.select_dtypes(include='object').columns.tolist()
 
-        return self
+        if self.numeric_cols:
+            df[self.numeric_cols] = self.numeric_imputer.fit_transform(df[self.numeric_cols])
+        if self.cat_cols:
+            df[self.cat_cols] = self.cat_imputer.fit_transform(df[self.cat_cols])
 
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        df_copy = df.copy()
+        return df
 
-        if self.numeric_cols is not None:
-            df_copy[self.numeric_cols] = self.numeric_imputer.transform(df_copy[self.numeric_cols])
-        if self.categorical_cols is not None:
-            df_copy[self.categorical_cols] = self.categorical_imputer.transform(df_copy[self.categorical_cols])
+    def transform(self, df: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
+        if isinstance(df, pd.Series):
+            df_2d = df.to_frame()
+            result = self.cat_imputer.transform(df_2d)
+            return pd.Series(result.ravel(), name=df.name, index=df.index)
 
-        return df_copy
+        if self.numeric_cols:
+            df[self.numeric_cols] = self.numeric_imputer.transform(df[self.numeric_cols])
+        if self.cat_cols:
+            df[self.cat_cols] = self.cat_imputer.transform(df[self.cat_cols])
 
-    def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return self.fit(df).transform(df)
+        return df
 
-    def apply(self, df: pd.DataFrame) -> pd.DataFrame:
+    def apply(self, df: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
         return self.fit_transform(df)
 
 class OutlierTransformStrategy(PreprocessingStrategy):
@@ -140,25 +144,27 @@ class OutlierTransformStrategy(PreprocessingStrategy):
         self.method = method
         self.iqr_threshold = iqr_threshold
         self.handler = None
-        self.numeric_cols = None
+        self.numeric_cols = []
 
-    def fit(self, df: pd.DataFrame):
-        self.numeric_cols = df.select_dtypes(include='number').columns
-        df_numeric = df[self.numeric_cols]
+    def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_copy = df.copy()
+        self.numeric_cols = df_copy.select_dtypes(include='number').columns
+        df_numeric = df_copy[self.numeric_cols]
+
         self.handler = OutlierHandler(df_numeric, iqr_threshold=self.iqr_threshold)
-        self.handler.fit(self.method)
-        return self
+        transformed = self.handler.transform(self.method)
+
+        df_copy[self.numeric_cols] = transformed
+        return df_copy
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
         df_copy = df.copy()
         df_numeric = df_copy[self.numeric_cols]
-        df_transformed = self.handler.transform(self.method, df_numeric)
-        df_copy[self.numeric_cols] = df_transformed
+
+        transformed = self.handler.transform(self.method)
+        df_copy[self.numeric_cols] = transformed
         return df_copy
-
-    def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        return self.fit(df).transform(df)
-
+    
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         return self.fit_transform(df)
 
@@ -206,6 +212,7 @@ def execute_data_preprocessing() -> None:
         CustomException: If preprocessing or saving fails.
     """
     try:
+        logger.info(f"Starting Data_preprocessing ..")
         db_context = SQLiteStrategy(db_path=sqlite_path)
         query = f"SELECT * FROM {table_name}"
         df: pd.DataFrame = db_context.read_query(query=query)
@@ -231,12 +238,25 @@ def execute_data_preprocessing() -> None:
         imputer = ImputeMissingValuesStrategy(imputation_method)
         outlier = OutlierTransformStrategy(outlier_method, iqr_threshold)
 
-        X_train, X_val, X_test = imputer.apply(X_train), imputer.transform(X_val), imputer.transform(X_test)
-        X_train, X_val, X_test = outlier.apply(X_train), outlier.transform(X_val), outlier.transform(X_test)
-        y_train, y_val, y_test = imputer.apply(y_train), imputer.transform(y_val), imputer.transform(y_test)
+        # 1. Impute X (train/val/test)
+        X_train = imputer.apply(X_train)          # fit + transform
+        X_val   = imputer.transform(X_val)        # transform only
+        X_test  = imputer.transform(X_test)
+
+        # 2. Outlier Transform X (only numerical cols)
+        X_train = outlier.apply(X_train)          # fit + transform
+        X_val   = outlier.transform(X_val)        # transform only
+        X_test  = outlier.transform(X_test)
+
+        # 3. Impute y (most_frequent), only if needed
+        y_train = imputer.apply(y_train)          # fit + transform
+        y_val   = imputer.transform(y_val)         #transform only 
+        y_test  = imputer.transform(y_test)
+
+        # 4. Convert target to binary (after imputation)
         y_train = y_train.map({"Existing Customer": 0, "Attrited Customer": 1})
-        y_val= y_val.map({"Existing Customer": 0, "Attrited Customer": 1})
-        y_test= y_test.map({"Existing Customer": 0, "Attrited Customer": 1})
+        y_val   = y_val.map({"Existing Customer": 0, "Attrited Customer": 1})
+        y_test  = y_test.map({"Existing Customer": 0, "Attrited Customer": 1})
         
         encoding_transformer = ColumnTransformer([
             ('ord', OrdinalEncoder(categories=[categories[col] for col in ordinal_cols]), ordinal_cols),

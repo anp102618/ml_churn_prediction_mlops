@@ -1,4 +1,4 @@
-Metadata-Version: 2.1
+Metadata-Version: 2.4
 Name: Bank-Churn-Predictor-Algorithm
 Version: 0.1
 Summary: ML based Churn Prediction
@@ -27,3 +27,7 @@ Requires-Dist: statsmodels
 Requires-Dist: numpy
 Requires-Dist: pandas
 Requires-Dist: imblearn
+Dynamic: author
+Dynamic: requires-dist
+Dynamic: requires-python
+Dynamic: summary
