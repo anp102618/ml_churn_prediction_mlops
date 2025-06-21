@@ -34,7 +34,6 @@ list_of_files = [
     f"Model_Utils/feature_outlier_handling.py",
     f"Model_Utils/classsification_models.py",
     f"Model_Utils/feature_scaling.py",
-    f"Model_Utils/feature_encoding.py",
     f"Model_Utils/feature_sampling.py",
     f"Model_Utils/feature_selection_extraction.py",
   
@@ -42,7 +41,7 @@ list_of_files = [
     f"src/__init__.py",
     f"src/Data_Ingestion.py",
     f"src/Data_Validation.py",
-    f"src/Data_Transformation.py",
+    f"src/Data_Preprocessing.py",
     f"src/Model_tune_evaluate.py",
     f"src/Experiment_Tracking_Prediction.py",
 

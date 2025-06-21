@@ -26,6 +26,7 @@ Requires-Dist: dvc
 Requires-Dist: statsmodels
 Requires-Dist: numpy
 Requires-Dist: pandas
+Requires-Dist: imblearn
 Dynamic: author
 Dynamic: requires-dist
 Dynamic: requires-python

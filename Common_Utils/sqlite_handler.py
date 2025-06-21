@@ -3,6 +3,7 @@ import sys
 import sqlite3
 import pandas as pd
 from typing import Optional
+from pathlib import Path
 from Common_Utils import CustomException, track_performance, setup_logger,load_yaml
 
 # Setup logger
@@ -48,6 +49,34 @@ class SQLiteStrategy:
                 logger.info(f"Closed connection to SQLite DB.")
         except Exception as e:
             logger.warning(f"Failed to close DB: {e}")
+            raise CustomException(e, sys)
+
+    def read_table_from_db(db_path: str, table_name: str) -> pd.DataFrame:
+        """
+        Reads an entire table from a SQLite database and returns it as a DataFrame.
+
+        Args:
+            db_path (str): Path to the SQLite database file.
+            table_name (str): Name of the table to read.
+
+        Returns:
+            pd.DataFrame: Table contents.
+        """
+        try:
+            db_path = Path(db_path)
+            if not db_path.exists():
+                raise FileNotFoundError(f"Database file not found at: {db_path}")
+            
+            conn = sqlite3.connect(str(db_path))
+            query = f"SELECT * FROM {table_name}"
+            df = pd.read_sql_query(query, conn)
+            conn.close()
+
+            logger.info(f"Read table '{table_name}' from '{db_path}'. Rows fetched: {len(df)}")
+            return df
+
+        except Exception as e:
+            logger.error(f"Failed to read table '{table_name}' from '{db_path}': {e}")
             raise CustomException(e, sys)
 
     def read_query(self, query: str) -> pd.DataFrame:

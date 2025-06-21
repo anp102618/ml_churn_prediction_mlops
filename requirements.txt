@@ -20,4 +20,5 @@ dvc
 statsmodels
 numpy
 pandas
+imblearn
 -e .

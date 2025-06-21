@@ -16,7 +16,6 @@ Data/raw_data/extracted_files/__init__.py
 Data/raw_data/zip_files/__init__.py
 Model_Utils/__init__.py
 Model_Utils/classsification_models.py
-Model_Utils/feature_encoding.py
 Model_Utils/feature_nan_imputation.py
 Model_Utils/feature_outlier_handling.py
 Model_Utils/feature_sampling.py

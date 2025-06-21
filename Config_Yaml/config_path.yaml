@@ -12,3 +12,17 @@ DataValidation:
     raw_df_path: Data/raw_data/extracted_files/bank_churners.csv
 
   const:
+
+  Data_Preprocessing:
+
+  path:
+    sqlite_path: "Data/data.db"             
+    sqlite_table: "raw_data"                   
+    processed_output_dir: "Data/processed_data"           
+
+  const:
+    target_column: "Attrition_Flag"                    
+    imputation_method: "mean"                          
+    outlier_method: "yeo"                             
+    iqr_threshold: 1.5                                 
+    scaler: "standard" 
