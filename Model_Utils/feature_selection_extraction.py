@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
-from sklearn.feature_selection import SelectKBest, f_regression, VarianceThreshold
+from sklearn.feature_selection import SelectKBest, VarianceThreshold, f_classif
 from sklearn.decomposition import KernelPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 import pandas as pd
-from typing import Optional, Union
+from typing import Optional, Union, List, Dict
 
 
 class FeatureProcessor(ABC):
@@ -24,16 +24,25 @@ class FeatureProcessor(ABC):
         """
         pass
 
+    @abstractmethod
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        """
+        Transform the input data using the fitted feature processor.
 
+        Args:
+            X (pd.DataFrame): The input feature matrix to transform.
+
+        Returns:
+            pd.DataFrame: The transformed feature matrix.
+        """
+        pass
 # ========================== Selection Strategies ===========================
 
 class SelectKBestStrategy(FeatureProcessor):
-    """
-    Selects top-k features based on univariate regression tests.
-    """
-    def __init__(self, k: int = 10):
+    def __init__(self, k: int = 5):
         self.k = k
-        self.selector = SelectKBest(score_func=f_regression, k=self.k)
+        self.selector = SelectKBest(score_func=f_classif, k=self.k)
+        self.selected_columns = None 
 
     def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
         if y is None:
@@ -41,8 +50,15 @@ class SelectKBestStrategy(FeatureProcessor):
         if X.empty:
             raise ValueError("Input DataFrame 'X' is empty.")
         X_new = self.selector.fit_transform(X, y)
-        selected_features = X.columns[self.selector.get_support()]
-        return pd.DataFrame(X_new, columns=selected_features, index=X.index)
+        self.selected_columns = X.columns[self.selector.get_support()].tolist()
+        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        if self.selected_columns is None:
+            raise ValueError("You must call process() before transform().")
+        X = X[self.selected_columns]  
+        X_new = self.selector.transform(X)
+        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
 
 
 class VarianceThresholdStrategy(FeatureProcessor):
@@ -51,14 +67,24 @@ class VarianceThresholdStrategy(FeatureProcessor):
     """
     def __init__(self, threshold: float = 0.0):
         self.selector = VarianceThreshold(threshold=threshold)
+        self.selected_columns = None
+        self.is_fitted = False
 
     def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
         if X.empty:
             raise ValueError("Input DataFrame 'X' is empty.")
         X_new = self.selector.fit_transform(X)
-        selected_features = X.columns[self.selector.get_support()]
-        return pd.DataFrame(X_new, columns=selected_features, index=X.index)
+        self.selected_columns = X.columns[self.selector.get_support()]
+        self.is_fitted = True
+        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
 
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        if not self.is_fitted:
+            raise ValueError("You must call `process()` before `transform()`.")
+        if X.empty:
+            raise ValueError("Input DataFrame 'X' is empty.")
+        X_new = self.selector.transform(X)
+        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
 
 # ========================== Extraction Strategies ===========================
 
@@ -69,6 +95,8 @@ class LDAStrategy(FeatureProcessor):
     def __init__(self, n_components: Optional[int] = None):
         self.n_components = n_components
         self.lda = LDA(n_components=self.n_components)
+        self.columns = None
+        self.is_fitted = False
 
     def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
         if y is None:
@@ -78,24 +106,44 @@ class LDAStrategy(FeatureProcessor):
         X_new = self.lda.fit_transform(X, y)
         if X_new.ndim == 1:
             X_new = X_new.reshape(-1, 1)
-        n_comps = X_new.shape[1]
-        columns = [f'LDA{i+1}' for i in range(n_comps)]
-        return pd.DataFrame(X_new, columns=columns, index=X.index)
+        self.columns = [f'LDA{i+1}' for i in range(X_new.shape[1])]
+        self.is_fitted = True
+        return pd.DataFrame(X_new, columns=self.columns, index=X.index)
 
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        if not self.is_fitted:
+            raise ValueError("You must call `process()` before `transform()`.")
+        if X.empty:
+            raise ValueError("Input DataFrame 'X' is empty.")
+        X_new = self.lda.transform(X)
+        if X_new.ndim == 1:
+            X_new = X_new.reshape(-1, 1)
+        return pd.DataFrame(X_new, columns=self.columns, index=X.index)
 
+    
 class KernelPCAStrategy(FeatureProcessor):
     """
     Applies Kernel PCA transformation for nonlinear feature extraction.
     """
-    def __init__(self, n_components: int = 5, kernel: str = 'rbf'):
+    def __init__(self, n_components: int = 15, kernel: str = 'rbf'):
         self.n_components = n_components
         self.kernel = kernel
         self.kpca = KernelPCA(n_components=self.n_components, kernel=self.kernel)
+        self.input_columns: Optional[List[str]] = None 
 
     def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
         if X.empty:
             raise ValueError("Input DataFrame 'X' is empty.")
+        self.input_columns = X.columns.tolist() 
         X_new = self.kpca.fit_transform(X)
+        columns = [f'KPC{i+1}' for i in range(self.n_components)]
+        return pd.DataFrame(X_new, columns=columns, index=X.index)
+
+    def transform(self, X: pd.DataFrame) -> pd.DataFrame:
+        if self.input_columns is None:
+            raise ValueError("You must call process() before transform().")
+        X = X[self.input_columns] 
+        X_new = self.kpca.transform(X)
         columns = [f'KPC{i+1}' for i in range(self.n_components)]
         return pd.DataFrame(X_new, columns=columns, index=X.index)
 

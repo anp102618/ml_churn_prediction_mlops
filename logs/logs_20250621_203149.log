@@ -1,0 +1,68 @@
+[2025-06-21 20:31:49,876] 123 __init__.py - INFO - Loaded config from Config_Yaml/classifiers.yaml
+[2025-06-21 20:31:50,034] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-21 20:31:50,037] 100 __init__.py - INFO - Running 'execute_model_tune_evaluate'...
+[2025-06-21 20:31:50,037] 152 Model_Tune_Evaluate.py - INFO - Starting Classification Model Tuning...
+[2025-06-21 20:31:50,096] 100 __init__.py - INFO - Running 'run_grid_search'...
+[2025-06-21 20:31:50,118] 90 Model_Tune_Evaluate.py - INFO - Running Bayesian search for: logistic_regression
+[2025-06-21 20:34:58,066] 134 Model_Tune_Evaluate.py - ERROR - Bayesian search failed.
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 122, in run_grid_search
+    X_extracted_test = extractor.transform(X_selected_test)
+  File "d:\ml_churn_prediction_mlops\Model_Utils\feature_selection_extraction.py", line 53, in transform
+    X_new = self.selector.transform(X)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\feature_selection\_base.py", line 107, in transform
+    X = validate_data(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2944, in validate_data
+    out = check_array(X, input_name="X", **check_params)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 1107, in check_array
+    _assert_all_finite(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 120, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 169, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input X contains NaN.
+SelectKBest does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+[2025-06-21 20:34:58,085] 158 Model_Tune_Evaluate.py - CRITICAL - Fatal error in classifier tuning pipeline.
+[2025-06-21 20:34:58,085] 90 __init__.py - CRITICAL - Unhandled Exception
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 122, in run_grid_search
+    X_extracted_test = extractor.transform(X_selected_test)
+  File "d:\ml_churn_prediction_mlops\Model_Utils\feature_selection_extraction.py", line 53, in transform
+    X_new = self.selector.transform(X)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\feature_selection\_base.py", line 107, in transform
+    X = validate_data(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2944, in validate_data
+    out = check_array(X, input_name="X", **check_params)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 1107, in check_array
+    _assert_all_finite(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 120, in _assert_all_finite
+    _assert_all_finite_element_wise(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 169, in _assert_all_finite_element_wise
+    raise ValueError(msg_err)
+ValueError: Input X contains NaN.
+SelectKBest does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 154, in execute_model_tune_evaluate
+    tuner.save_results(tuned_model_yaml)
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 135, in run_grid_search
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [122] - Message: [Input X contains NaN.
+SelectKBest does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 163, in <module>
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 159, in execute_model_tune_evaluate
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [154] - Message: [Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [122] - Message: [Input X contains NaN.
+SelectKBest does not accept missing values encoded as NaN natively. For supervised learning, you might want to consider sklearn.ensemble.HistGradientBoostingClassifier and Regressor which accept missing values encoded as NaNs natively. Alternatively, it is possible to preprocess the data, for instance by using an imputer transformer in a pipeline or drop samples with missing values. See https://scikit-learn.org/stable/modules/impute.html You can find a list of all estimators that handle NaN values at the following page: https://scikit-learn.org/stable/modules/impute.html#estimators-that-handle-nan-values]]

@@ -1,0 +1,43 @@
+[2025-06-21 20:21:44,256] 123 __init__.py - INFO - Loaded config from Config_Yaml/classifiers.yaml
+[2025-06-21 20:21:44,492] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-21 20:21:44,494] 100 __init__.py - INFO - Running 'execute_model_tune_evaluate'...
+[2025-06-21 20:21:44,494] 189 Model_Tune_Evaluate.py - INFO - Starting Classification Model Tuning...
+[2025-06-21 20:21:44,544] 100 __init__.py - INFO - Running 'run_grid_search'...
+[2025-06-21 20:21:44,565] 112 Model_Tune_Evaluate.py - INFO - Running grid search for: logistic_regression
+[2025-06-21 20:21:44,566] 162 Model_Tune_Evaluate.py - ERROR - Grid search failed.
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 113, in run_grid_search
+    param_grid = list(self.generate_param_grid(model_info['params']))
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 73, in generate_param_grid
+    for v in itertools.product(*values):
+TypeError: 'float' object is not iterable
+[2025-06-21 20:21:44,567] 195 Model_Tune_Evaluate.py - CRITICAL - Fatal error in classifier tuning pipeline.
+[2025-06-21 20:21:44,567] 90 __init__.py - CRITICAL - Unhandled Exception
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 113, in run_grid_search
+    param_grid = list(self.generate_param_grid(model_info['params']))
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 73, in generate_param_grid
+    for v in itertools.product(*values):
+TypeError: 'float' object is not iterable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 191, in execute_model_tune_evaluate
+    tuner.run_grid_search()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 163, in run_grid_search
+    raise CustomException(e,sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [113] - Message: ['float' object is not iterable]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 200, in <module>
+    execute_model_tune_evaluate()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 196, in execute_model_tune_evaluate
+    raise CustomException(e,sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [191] - Message: [Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [113] - Message: ['float' object is not iterable]]

@@ -14,11 +14,11 @@ DataValidation:
   const:
 
 Data_Preprocessing:
-
   path:
     sqlite_path: "Data/data.db"             
     sqlite_table: "raw_data"                   
-    processed_output_dir: "Data/processed_data"           
+    processed_output_dir: "Data/processed_data" 
+    tuned_output_dir: "Tuned_Model"          
 
   const:
     target_column: "Attrition_Flag"                    
@@ -27,3 +27,19 @@ Data_Preprocessing:
     outlier_method: "yeo"                             
     iqr_threshold: 1.5                                 
     scaler: "standard" 
+
+Model_Tune_Evaluate:
+  path:
+    processed_data_dir: Data/processed_data
+    tuned_model_yaml: Config_Yaml/tuned_models.yaml
+    classifiers_yaml: Config_Yaml/classifiers.yaml
+    selector_path: Tuned_Model/selector.joblib
+    extractor_path: Tuned_Model/extractor.joblib
+
+  const:
+    allowed_models: ["logistic_regression","xgboost"]
+    sampling: smote
+    selection: selectkbest
+    extraction: kernelpca
+    k: 20
+    n_components: 15

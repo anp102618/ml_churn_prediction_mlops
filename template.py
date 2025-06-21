@@ -32,7 +32,7 @@ list_of_files = [
     f"Model_Utils/__init__.py",
     f"Model_Utils/feature_nan_imputation.py",
     f"Model_Utils/feature_outlier_handling.py",
-    f"Model_Utils/classsification_models.py",
+    f"Model_Utils/classification_models.py",
     f"Model_Utils/feature_scaling.py",
     f"Model_Utils/feature_sampling.py",
     f"Model_Utils/feature_selection_extraction.py",

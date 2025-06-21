@@ -15,7 +15,7 @@ Data/raw_data/__init__.py
 Data/raw_data/extracted_files/__init__.py
 Data/raw_data/zip_files/__init__.py
 Model_Utils/__init__.py
-Model_Utils/classsification_models.py
+Model_Utils/classification_models.py
 Model_Utils/feature_nan_imputation.py
 Model_Utils/feature_outlier_handling.py
 Model_Utils/feature_sampling.py
@@ -28,5 +28,6 @@ src/Data_Ingestion.py
 src/Data_Preprocessing.py
 src/Data_Validation.py
 src/Experiment_Tracking_Prediction.py
+src/Model_Tune_Evaluate.py
 src/Model_tune_evaluate.py
 src/__init__.py

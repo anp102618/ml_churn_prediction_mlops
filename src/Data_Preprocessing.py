@@ -26,6 +26,7 @@ config = load_yaml("Config_Yaml/config_path.yaml")
 sqlite_path: Path = Path(config["Data_Preprocessing"]["path"]["sqlite_path"])
 table_name: str = config["Data_Preprocessing"]["path"]["sqlite_table"]
 output_dir: Path = Path(config["Data_Preprocessing"]["path"]["processed_output_dir"])
+tuned_model_dir: Path = Path(config["Data_Preprocessing"]["path"]["tuned_output_dir"])
 output_dir.mkdir(exist_ok=True)
 target_column: str = config["Data_Preprocessing"]["const"]["target_column"]
 imputation_method: str = config["Data_Preprocessing"]["const"]["imputation_method"]
@@ -273,7 +274,7 @@ def execute_data_preprocessing() -> None:
         X_val_final = full_pipeline.transform(X_val)
         X_test_final = full_pipeline.transform(X_test)
 
-        joblib.dump(full_pipeline, output_dir / "encoder_scaler.pkl")
+        joblib.dump(full_pipeline, tuned_model_dir / "encoder_scaler.joblib")
         logger.info("Saved encoder_scaler.pkl successfully.")
 
         pd.DataFrame(X_train_final).to_csv(output_dir / "X_train.csv", index=False)

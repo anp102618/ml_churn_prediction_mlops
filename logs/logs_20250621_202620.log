@@ -1,0 +1,43 @@
+[2025-06-21 20:26:20,676] 123 __init__.py - INFO - Loaded config from Config_Yaml/classifiers.yaml
+[2025-06-21 20:26:20,832] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-21 20:26:20,832] 100 __init__.py - INFO - Running 'execute_model_tune_evaluate'...
+[2025-06-21 20:26:20,832] 152 Model_Tune_Evaluate.py - INFO - Starting Classification Model Tuning...
+[2025-06-21 20:26:20,894] 100 __init__.py - INFO - Running 'run_grid_search'...
+[2025-06-21 20:26:20,914] 90 Model_Tune_Evaluate.py - INFO - Running Bayesian search for: logistic_regression
+[2025-06-21 20:26:20,915] 134 Model_Tune_Evaluate.py - ERROR - Bayesian search failed.
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 91, in run_grid_search
+    search_space = get_search_space(model_info['params'])
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 44, in get_search_space
+    first = values[0]
+TypeError: 'float' object is not subscriptable
+[2025-06-21 20:26:20,915] 158 Model_Tune_Evaluate.py - CRITICAL - Fatal error in classifier tuning pipeline.
+[2025-06-21 20:26:20,915] 90 __init__.py - CRITICAL - Unhandled Exception
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 91, in run_grid_search
+    search_space = get_search_space(model_info['params'])
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 44, in get_search_space
+    first = values[0]
+TypeError: 'float' object is not subscriptable
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 154, in execute_model_tune_evaluate
+    tuner.run_grid_search()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 135, in run_grid_search
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [91] - Message: ['float' object is not subscriptable]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 163, in <module>
+    execute_model_tune_evaluate()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 159, in execute_model_tune_evaluate
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [154] - Message: [Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [91] - Message: ['float' object is not subscriptable]]

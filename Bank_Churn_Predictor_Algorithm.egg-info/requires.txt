@@ -1,4 +1,5 @@
 scikit-learn
+scikit-optimize
 matplotlib
 python-box==6.0.2
 pyYAML

@@ -1,0 +1,79 @@
+[2025-06-21 22:06:56,509] 123 __init__.py - INFO - Loaded config from Config_Yaml/classifiers.yaml
+[2025-06-21 22:06:56,805] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-21 22:06:56,805] 100 __init__.py - INFO - Running 'execute_model_tune_evaluate'...
+[2025-06-21 22:06:56,805] 151 Model_Tune_Evaluate.py - INFO - Starting Classification Model Tuning...
+[2025-06-21 22:06:56,924] 100 __init__.py - INFO - Running 'run_grid_search'...
+[2025-06-21 22:06:56,940] 89 Model_Tune_Evaluate.py - INFO - Running Bayesian search for: logistic_regression
+[2025-06-21 22:10:12,845] 133 Model_Tune_Evaluate.py - ERROR - Bayesian search failed.
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 121, in run_grid_search
+    X_selected_test = selector.transform(self.X_test)
+  File "d:\ml_churn_prediction_mlops\Model_Utils\feature_selection_extraction.py", line 49, in transform
+    X_new = self.selector.transform(X)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\feature_selection\_base.py", line 107, in transform
+    X = validate_data(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2919, in validate_data
+    _check_feature_names(_estimator, X, reset=reset)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2777, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- 1
+- 2
+- 8
+
+[2025-06-21 22:10:12,862] 157 Model_Tune_Evaluate.py - CRITICAL - Fatal error in classifier tuning pipeline.
+[2025-06-21 22:10:12,862] 90 __init__.py - CRITICAL - Unhandled Exception
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 121, in run_grid_search
+    X_selected_test = selector.transform(self.X_test)
+  File "d:\ml_churn_prediction_mlops\Model_Utils\feature_selection_extraction.py", line 49, in transform
+    X_new = self.selector.transform(X)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\feature_selection\_base.py", line 107, in transform
+    X = validate_data(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2919, in validate_data
+    _check_feature_names(_estimator, X, reset=reset)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2777, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- 1
+- 2
+- 8
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 153, in execute_model_tune_evaluate
+    tuner.run_grid_search()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 134, in run_grid_search
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [121] - Message: [The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- 1
+- 2
+- 8
+]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 162, in <module>
+    execute_model_tune_evaluate()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 158, in execute_model_tune_evaluate
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [153] - Message: [Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [121] - Message: [The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- 1
+- 2
+- 8
+]]

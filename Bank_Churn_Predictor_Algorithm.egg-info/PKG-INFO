@@ -5,6 +5,7 @@ Summary: ML based Churn Prediction
 Author: ANP
 Requires-Python: >=3.7
 Requires-Dist: scikit-learn
+Requires-Dist: scikit-optimize
 Requires-Dist: matplotlib
 Requires-Dist: python-box==6.0.2
 Requires-Dist: pyYAML
