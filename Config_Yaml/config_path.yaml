@@ -22,7 +22,8 @@ Data_Preprocessing:
 
   const:
     target_column: "Attrition_Flag"                    
-    imputation_method: "mean"                          
+    imputation_method: "mean"        
+    categorical_imputation_method: "mode"                  
     outlier_method: "yeo"                             
     iqr_threshold: 1.5                                 
     scaler: "standard" 

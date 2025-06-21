@@ -29,6 +29,7 @@ output_dir: Path = Path(config["Data_Preprocessing"]["path"]["processed_output_d
 output_dir.mkdir(exist_ok=True)
 target_column: str = config["Data_Preprocessing"]["const"]["target_column"]
 imputation_method: str = config["Data_Preprocessing"]["const"]["imputation_method"]
+#categorical_imputation_method: str = config["Data_Preprocessing"]["const"]["categorical_imputation_method"]
 outlier_method: str = config["Data_Preprocessing"]["const"]["outlier_method"]
 iqr_threshold: float = config["Data_Preprocessing"]["const"]["iqr_threshold"]
 scaler_type: str = config["Data_Preprocessing"]["const"].get("scaler", "standard")
@@ -78,20 +79,7 @@ class DropHighMissingStrategy(PreprocessingStrategy):
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         return df.dropna(axis=1, thresh=int(0.5 * len(df)))
 
-class ConvertTargetStrategy(PreprocessingStrategy):
-    """
-    Converts the target column 'Attrition_Flag' into binary format.
-
-    Args:
-        df (pd.DataFrame): Input DataFrame.
-
-    Returns:
-        pd.DataFrame: DataFrame with target column encoded as 0 or 1.
-    """
-    def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        df[target_column] = df[target_column].map({"Existing Customer": 0, "Attrited Customer": 1})
-        return df
-
+    
 class ImputeMissingValuesStrategy(PreprocessingStrategy):
     """
         Applies imputation to both numeric and categorical columns.
@@ -105,40 +93,75 @@ class ImputeMissingValuesStrategy(PreprocessingStrategy):
             pd.DataFrame: Imputed DataFrame.
     """
     def __init__(self, method: str):
-        self.imputer = ImputerFactory.get_imputer(method)
+        self.method = method
+        self.numeric_imputer = ImputerFactory.get_imputer(method)
+        self.categorical_imputer = SimpleImputer(strategy='most_frequent')
+        self.numeric_cols = None
+        self.categorical_cols = None
+
+    def fit(self, df: pd.DataFrame):
+        self.numeric_cols = df.select_dtypes(include='number').columns
+        self.categorical_cols = df.select_dtypes(include='object').columns
+
+        if len(self.numeric_cols) > 0:
+            self.numeric_imputer.fit(df[self.numeric_cols])
+        if len(self.categorical_cols) > 0:
+            self.categorical_imputer.fit(df[self.categorical_cols])
+
+        return self
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_copy = df.copy()
+
+        if self.numeric_cols is not None:
+            df_copy[self.numeric_cols] = self.numeric_imputer.transform(df_copy[self.numeric_cols])
+        if self.categorical_cols is not None:
+            df_copy[self.categorical_cols] = self.categorical_imputer.transform(df_copy[self.categorical_cols])
+
+        return df_copy
+
+    def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        return self.fit(df).transform(df)
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        # Impute numeric columns
-        numeric_cols = df.select_dtypes(include='number').columns
-        if not numeric_cols.empty:
-            df[numeric_cols] = self.imputer.fit_transform(df[numeric_cols])
-
-        # Impute categorical columns with most frequent
-        categorical_cols = df.select_dtypes(include='object').columns
-        if not categorical_cols.empty:
-            cat_imputer = SimpleImputer(strategy='most_frequent')
-            df[categorical_cols] = cat_imputer.fit_transform(df[categorical_cols])
-
-        return df
+        return self.fit_transform(df)
 
 class OutlierTransformStrategy(PreprocessingStrategy):
     """
-    Detects and transforms outliers using the specified transformation method.
+    Applies outlier transformation to numerical features only.
 
     Args:
-        method (str): Method to apply (e.g., 'yeo').
-        iqr_threshold (float): Threshold for identifying outliers.
-
-    Returns:
-        pd.DataFrame: Transformed DataFrame with outliers handled.
+        method (str): Transformation method (e.g., 'yeo', 'boxcox').
+        iqr_threshold (float): IQR threshold to identify outliers.
+    
+    Returns the full DataFrame with transformed numeric columns and untouched categorical columns.
     """
     def __init__(self, method: str, iqr_threshold: float):
         self.method = method
         self.iqr_threshold = iqr_threshold
+        self.handler = None
+        self.numeric_cols = None
+
+    def fit(self, df: pd.DataFrame):
+        self.numeric_cols = df.select_dtypes(include='number').columns
+        df_numeric = df[self.numeric_cols]
+        self.handler = OutlierHandler(df_numeric, iqr_threshold=self.iqr_threshold)
+        self.handler.fit(self.method)
+        return self
+
+    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        df_copy = df.copy()
+        df_numeric = df_copy[self.numeric_cols]
+        df_transformed = self.handler.transform(self.method, df_numeric)
+        df_copy[self.numeric_cols] = df_transformed
+        return df_copy
+
+    def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
+        return self.fit(df).transform(df)
 
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        handler = OutlierHandler(df, iqr_threshold=self.iqr_threshold)
-        return handler.transform(self.method)
+        return self.fit_transform(df)
+
 
 class PreprocessingContext:
     """
@@ -186,30 +209,35 @@ def execute_data_preprocessing() -> None:
         db_context = SQLiteStrategy(db_path=sqlite_path)
         query = f"SELECT * FROM {table_name}"
         df: pd.DataFrame = db_context.read_query(query=query)
+        df = df.drop(columns=['CLIENTNUM'])
+        print(df.columns)
 
         context = PreprocessingContext(df)
         context.add_step(RemoveDuplicatesStrategy())
         context.add_step(DropHighMissingStrategy())
-        context.add_step(ConvertTargetStrategy())
         df_clean = context.run()
+        print(df_clean.head())
 
         if df_clean.empty:
             raise CustomException("DataFrame is empty after cleaning. Cannot proceed.")
 
+        # Step 1: Split before any transformation
         X = df_clean.drop(columns=[target_column])
         y = df_clean[target_column]
 
         X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, stratify=y, random_state=42)
         X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, stratify=y_temp, random_state=42)
 
-        train_context = PreprocessingContext(X_train.join(y_train))
-        train_context.add_step(ImputeMissingValuesStrategy(imputation_method))
-        train_context.add_step(OutlierTransformStrategy(outlier_method, iqr_threshold))
-        train_df = train_context.run()
+        imputer = ImputeMissingValuesStrategy(imputation_method)
+        outlier = OutlierTransformStrategy(outlier_method, iqr_threshold)
 
-        y_train = train_df[target_column]
-        X_train = train_df.drop(columns=[target_column])
-
+        X_train, X_val, X_test = imputer.apply(X_train), imputer.transform(X_val), imputer.transform(X_test)
+        X_train, X_val, X_test = outlier.apply(X_train), outlier.transform(X_val), outlier.transform(X_test)
+        y_train, y_val, y_test = imputer.apply(y_train), imputer.transform(y_val), imputer.transform(y_test)
+        y_train = y_train.map({"Existing Customer": 0, "Attrited Customer": 1})
+        y_val= y_val.map({"Existing Customer": 0, "Attrited Customer": 1})
+        y_test= y_test.map({"Existing Customer": 0, "Attrited Customer": 1})
+        
         encoding_transformer = ColumnTransformer([
             ('ord', OrdinalEncoder(categories=[categories[col] for col in ordinal_cols]), ordinal_cols),
             ('ohe', OneHotEncoder(sparse_output=False, handle_unknown='ignore'), ohe_cols)

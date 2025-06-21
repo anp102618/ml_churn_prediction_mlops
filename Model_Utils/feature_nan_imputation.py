@@ -30,6 +30,13 @@ class MedianImputerStrategy(ImputerStrategy):
     def get_imputer(self) -> SimpleImputer:
         return SimpleImputer(strategy="median")
 
+class MostFrequentImputerStrategy(ImputerStrategy):
+    """
+    Strategy for imputing missing values using the most frequent value (mode).
+    """
+    def get_imputer(self) -> SimpleImputer:
+        return SimpleImputer(strategy="most_frequent")
+
 
 class KNNImputerStrategy(ImputerStrategy):
     """
@@ -56,6 +63,7 @@ class ImputerFactory:
         - "median"
         - "knn"
         - "iterative"
+        - "mode"
     """
     @staticmethod
     def get_imputer(strategy: str) -> Union[SimpleImputer, KNNImputer]:
@@ -77,6 +85,8 @@ class ImputerFactory:
             return MeanImputerStrategy().get_imputer()
         elif strategy == "median":
             return MedianImputerStrategy().get_imputer()
+        elif strategy == "mode":
+            return MostFrequentImputerStrategy().get_imputer()
         elif strategy == "knn":
             return KNNImputerStrategy().get_imputer()
         elif strategy == "iterative":
