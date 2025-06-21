@@ -42,23 +42,37 @@ class SelectKBestStrategy(FeatureProcessor):
     def __init__(self, k: int = 5):
         self.k = k
         self.selector = SelectKBest(score_func=f_classif, k=self.k)
-        self.selected_columns = None 
+        self.selected_columns = None
+        self.is_fitted = False
 
     def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
         if y is None:
             raise ValueError("Target variable 'y' is required for SelectKBest.")
         if X.empty:
             raise ValueError("Input DataFrame 'X' is empty.")
+        
         X_new = self.selector.fit_transform(X, y)
         self.selected_columns = X.columns[self.selector.get_support()].tolist()
+        self.is_fitted = True
+        
         return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        if self.selected_columns is None:
+        if not self.is_fitted or self.selected_columns is None:
             raise ValueError("You must call process() before transform().")
-        X = X[self.selected_columns]  
-        X_new = self.selector.transform(X)
+        
+        X_selected = X[self.selected_columns]
+        X_new = self.selector.transform(X_selected)
+        
         return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
+
+    def get_support(self, indices: bool = False):
+        if not self.is_fitted:
+            raise ValueError("Call process() before get_support().")
+        return self.selector.get_support(indices=indices)
+
+    def get_selected_columns(self) -> Optional[list]:
+        return self.selected_columns
 
 
 class VarianceThresholdStrategy(FeatureProcessor):
@@ -128,24 +142,33 @@ class KernelPCAStrategy(FeatureProcessor):
     def __init__(self, n_components: int = 15, kernel: str = 'rbf'):
         self.n_components = n_components
         self.kernel = kernel
-        self.kpca = KernelPCA(n_components=self.n_components, kernel=self.kernel)
-        self.input_columns: Optional[List[str]] = None 
+        self.kpca = KernelPCA(n_components=self.n_components, kernel=self.kernel, random_state=42)
+        self.input_columns: Optional[List[str]] = None
+        self.component_names: Optional[List[str]] = None
+        self.is_fitted: bool = False
 
     def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
         if X.empty:
             raise ValueError("Input DataFrame 'X' is empty.")
-        self.input_columns = X.columns.tolist() 
+        
+        self.input_columns = X.columns.tolist()
         X_new = self.kpca.fit_transform(X)
-        columns = [f'KPC{i+1}' for i in range(self.n_components)]
-        return pd.DataFrame(X_new, columns=columns, index=X.index)
+        self.component_names = [f'KPC{i+1}' for i in range(self.n_components)]
+        self.is_fitted = True
+
+        return pd.DataFrame(X_new, columns=self.component_names, index=X.index)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        if self.input_columns is None:
+        if not self.is_fitted:
             raise ValueError("You must call process() before transform().")
-        X = X[self.input_columns] 
+        
+        X = X[self.input_columns]
         X_new = self.kpca.transform(X)
-        columns = [f'KPC{i+1}' for i in range(self.n_components)]
-        return pd.DataFrame(X_new, columns=columns, index=X.index)
+        
+        return pd.DataFrame(X_new, columns=self.component_names, index=X.index)
+
+    def get_components(self) -> Optional[List[str]]:
+        return self.component_names
 
 
 # ============================ Strategy Factory ============================

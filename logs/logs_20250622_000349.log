@@ -1,0 +1,41 @@
+[2025-06-22 00:03:49,134] 123 __init__.py - INFO - Loaded config from Config_Yaml/classifiers.yaml
+[2025-06-22 00:03:49,752] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-22 00:03:49,754] 100 __init__.py - INFO - Running 'execute_model_tune_evaluate'...
+[2025-06-22 00:03:49,754] 177 Model_Tune_Evaluate.py - INFO - Starting Classification Model Tuning...
+[2025-06-22 00:03:49,881] 100 __init__.py - INFO - Running 'run_grid_search'...
+[2025-06-22 00:03:49,897] 89 Model_Tune_Evaluate.py - INFO - Running Bayesian search for: logistic_regression
+[2025-06-22 00:03:49,910] 93 Model_Tune_Evaluate.py - INFO - Starting Feature Engineering..
+[2025-06-22 00:03:49,910] 97 Model_Tune_Evaluate.py - INFO - Feature selector and extractor initialized..
+[2025-06-22 00:03:59,065] 160 Model_Tune_Evaluate.py - ERROR - Bayesian search failed.
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 102, in run_grid_search
+    selected_columns = self.X_train.columns[selector.get_support()]
+AttributeError: 'SelectKBestStrategy' object has no attribute 'get_support'
+[2025-06-22 00:03:59,073] 183 Model_Tune_Evaluate.py - CRITICAL - Fatal error in classifier tuning pipeline.
+[2025-06-22 00:03:59,073] 90 __init__.py - CRITICAL - Unhandled Exception
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 102, in run_grid_search
+    selected_columns = self.X_train.columns[selector.get_support()]
+AttributeError: 'SelectKBestStrategy' object has no attribute 'get_support'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 179, in execute_model_tune_evaluate
+    tuner.run_grid_search()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 161, in run_grid_search
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [102] - Message: ['SelectKBestStrategy' object has no attribute 'get_support']
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 188, in <module>
+    execute_model_tune_evaluate()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 184, in execute_model_tune_evaluate
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [179] - Message: [Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [102] - Message: ['SelectKBestStrategy' object has no attribute 'get_support']]

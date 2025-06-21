@@ -38,15 +38,6 @@ n_components: int = config["Model_Tune_Evaluate"]["const"]["n_components"]
 
 
 def get_search_space(param_grid: Dict[str, List[Any]]) -> Dict[str, Any]:
-    """
-    Convert a parameter grid into a search space for Bayesian Optimization.
-
-    Args:
-        param_grid (Dict[str, List[Any]]): Dictionary of hyperparameters.
-
-    Returns:
-        Dict[str, Any]: skopt-compatible search space.
-    """
     search_space = {}
     for key, values in param_grid.items():
         first = values[0]
@@ -60,19 +51,7 @@ def get_search_space(param_grid: Dict[str, List[Any]]) -> Dict[str, Any]:
 
 
 class ClassificationModelTuner:
-    """
-    A pipeline class for hyperparameter tuning, feature engineering, and model evaluation
-    using Bayesian Optimization with ROC AUC scoring.
-    """
-
     def __init__(self, config_path: Path, allowed_models: Optional[List[str]] = None):
-        """
-        Initializes the tuner with data and configuration.
-
-        Args:
-            config_path (Path): Path to classifier model YAML config.
-            allowed_models (Optional[List[str]]): Optional list of model names to include.
-        """
         self.factory = ModelFactory(config_path)
         self.config_path = config_path
         self.allowed_models = allowed_models
@@ -86,17 +65,6 @@ class ClassificationModelTuner:
         self.results = []
 
     def evaluate_model(self, model: Any, X: np.ndarray, y: np.ndarray) -> Dict[str, float]:
-        """
-        Evaluate a classifier using various metrics.
-
-        Args:
-            model (Any): Fitted classifier.
-            X (np.ndarray): Feature matrix.
-            y (np.ndarray): True labels.
-
-        Returns:
-            Dict[str, float]: Dictionary of evaluation scores.
-        """
         preds = model.predict(X)
         proba = model.predict_proba(X)[:, 1] if hasattr(model, 'predict_proba') else preds
         return {
@@ -109,10 +77,6 @@ class ClassificationModelTuner:
 
     @track_performance
     def run_grid_search(self) -> None:
-        """
-        Perform Bayesian hyperparameter tuning, feature processing,
-        fine-tuning, and evaluation on test data.
-        """
         try:
             with open(self.config_path, 'r') as f:
                 config = yaml.safe_load(f)
@@ -126,7 +90,6 @@ class ClassificationModelTuner:
                 search_space = get_search_space(model_info['params'])
                 kf = StratifiedKFold(n_splits=5, shuffle=True, random_state=42)
 
-                # Feature engineering
                 logger.info(f"Starting Feature Engineering..")
                 sampler = SamplingFactory.get_sampler(sampling_method)
                 selector = FeatureFactory.get_processor(kind='selection', method=selection_method, k=k)
@@ -135,10 +98,12 @@ class ClassificationModelTuner:
 
                 X_sampled, y_sampled = sampler.sample(self.X_train, self.y_train)
                 X_selected = selector.process(X_sampled, y_sampled)
+                selected_columns = selector.get_selected_columns()
                 X_extracted = extractor.process(X_selected, y_sampled)
+                X_extracted_df = pd.DataFrame(X_extracted)
+
                 logger.info(f"Feature Engineering completed..")
 
-                # Model tuning
                 logger.info(f"Starting model tuning..")
                 model = self.factory.get_model(model_name)
                 opt = BayesSearchCV(
@@ -152,32 +117,31 @@ class ClassificationModelTuner:
                     random_state=42
                 )
                 opt.fit(X_extracted, y_sampled)
-
                 best_model = opt.best_estimator_
                 best_params = opt.best_params_
 
                 logger.info(f"initial model tuning finished..")
 
-                # Fine-tune on (train + val)
                 logger.info(f"Starting model fine tuning on (train+val)..")
-                X_val_selected = selector.transform(self.X_val)
+                X_val_resampled = self.X_val.copy()  
+                X_val_selected = selector.transform(X_val_resampled[selected_columns])
                 X_val_extracted = extractor.transform(X_val_selected)
-                X_finetune = pd.concat([X_extracted, X_val_extracted], axis=0)
-                y_finetune = pd.concat([y_sampled, self.y_val], axis=0)
+
+                X_finetune = np.concatenate([X_extracted_df, X_val_extracted], axis=0)
+                y_finetune = np.concatenate([y_sampled, self.y_val], axis=0)
                 best_model.fit(X_finetune, y_finetune)
                 logger.info(f" model fine tuning on (train+val) completed..")
 
-                # Save processor artifacts
                 selector_path.parent.mkdir(parents=True, exist_ok=True)
                 extractor_path.parent.mkdir(parents=True, exist_ok=True)
                 joblib.dump(selector, selector_path)
                 joblib.dump(extractor, extractor_path)
                 logger.info(f"saved processor artifacts successfully..")
 
-                # Final evaluation
-                X_selected_test = selector.transform(self.X_test)
-                X_extracted_test = extractor.transform(X_selected_test)
-                test_scores = self.evaluate_model(best_model, X_extracted_test, self.y_test)
+                X_test_selected = selector.transform(self.X_test[selected_columns])
+                X_test_extracted = extractor.transform(X_test_selected)
+
+                test_scores = self.evaluate_model(best_model, X_test_extracted, self.y_test)
 
                 logger.info(f"Best ROC AUC for {model_name}: {round(test_scores['roc_auc'], 4)}")
                 logger.info(f"Best Params: {best_params}")
@@ -195,17 +159,10 @@ class ClassificationModelTuner:
             raise CustomException(e, sys)
 
     def save_results(self, output_path: Path) -> None:
-        """
-        Save sorted model results to a YAML file.
-
-        Args:
-            output_path (Path): Path to save YAML results.
-        """
         try:
             sorted_results = sorted(self.results, key=lambda x: x['roc_auc'], reverse=True)
             with open(output_path, 'w') as f:
                 yaml.dump(sorted_results, f, default_flow_style=False, sort_keys=False)
-
             logger.info(f"Best model: {sorted_results[0]['model']} with ROC AUC: {sorted_results[0]['roc_auc']}")
         except Exception as e:
             logger.exception("Failed to save results.")
@@ -214,9 +171,6 @@ class ClassificationModelTuner:
 
 @track_performance
 def execute_model_tune_evaluate() -> None:
-    """
-    Orchestrate the full tuning and evaluation pipeline.
-    """
     try:
         logger.info("Starting Classification Model Tuning...")
         tuner = ClassificationModelTuner(config_path=classifiers_yaml, allowed_models=allowed_models)
