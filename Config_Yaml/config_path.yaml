@@ -28,6 +28,27 @@ Data_Preprocessing:
     iqr_threshold: 1.5                                 
     scaler: "standard" 
 
+
+DataTransformation:
+  path:
+    X_train_path: "Data/raw_data/preprocessed_data/X_train.csv"
+    X_val_path: "Data/raw_data/preprocessed_data/X_val.csv"
+    X_test_path: "Data/raw_data/preprocessed_data/X_test.csv"
+    y_train_path: "Data/raw_data/preprocessed_data/y_train.csv"
+    y_val_path: "Data/raw_data/preprocessed_data/y_val.csv"
+    y_test_path: "Data/raw_data/preprocessed_data/y_test.csv"
+    enc_scaler_path: "Tuned_Model/encoder_scaler.joblib"
+    selector_path: "Tuned_Model/selector.joblib"
+    extractor_path: "Tuned_Model/extractor.joblib"
+    processed_data_folder: "Data/processed_data"
+
+  const:
+    sampler_method: "smote"
+    selector_method: "selectkbest"
+    extractor_method: "kernelpca"
+    k: 20
+    n_components: 15
+
 Model_Tune_Evaluate:
   path:
     processed_data_dir: Data/processed_data

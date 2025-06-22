@@ -119,6 +119,20 @@ def execute_data_preprocessing() -> None:
         y_val = y_val_impute.iloc[:, 0].map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
         y_test = y_test_impute.iloc[:, 0].map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
 
+        # save processed data 
+        raw_data_dir = Path("Data/raw_data/preprocessed_data")
+        raw_data_dir.mkdir(parents=True, exist_ok=True)  # Create directory if it doesn't exist
+
+        # Save feature sets
+        X_train.to_csv(raw_data_dir / "X_train.csv", index=False)
+        X_val.to_csv(raw_data_dir / "X_val.csv", index=False)
+        X_test.to_csv(raw_data_dir / "X_test.csv", index=False)
+
+        # Save target sets
+        y_train.to_csv(raw_data_dir / "y_train.csv", index=False)
+        y_val.to_csv(raw_data_dir / "y_val.csv", index=False)
+        y_test.to_csv(raw_data_dir / "y_test.csv", index=False)
+
         # Encoding + Scaling Pipeline
         encoding_transformer = ColumnTransformer([
             ('ord', OrdinalEncoder(categories=[categories[col] for col in ordinal_cols]), ordinal_cols),

@@ -42,6 +42,7 @@ list_of_files = [
     f"src/Data_Ingestion.py",
     f"src/Data_Validation.py",
     f"src/Data_Preprocessing.py",
+    f"src/Data_Transformation.py",
     f"src/Model_tune_evaluate.py",
     f"src/Experiment_Tracking_Prediction.py",
 
