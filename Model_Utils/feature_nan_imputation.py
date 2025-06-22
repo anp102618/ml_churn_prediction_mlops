@@ -98,40 +98,46 @@ class ImputerFactory:
 
 class DataImputer:
     """
-    Wrapper class to handle missing value imputation for numeric and categorical columns separately.
-
+    Unified imputer class that automatically applies numeric or categorical
+    imputation based on column types.
+    
     Attributes:
         numeric_imputer (TransformerMixin): Imputer for numeric columns.
         categorical_imputer (TransformerMixin): Imputer for categorical columns.
         numeric_cols (List[str]): List of numeric columns detected in fit().
         categorical_cols (List[str]): List of categorical columns detected in fit().
+
+    - Uses one imputer object internally for numeric and one for categorical.
+    - Can be used on both X (multiple columns) and y (single-column) DataFrames.
     """
 
     def __init__(self,
                  numeric_strategy: str = "mean",
                  categorical_strategy: str = "most_frequent") -> None:
-        """
-        Initializes DataImputer with chosen strategies.
-
-        Args:
-            numeric_strategy (str): Strategy for numeric imputation.
-            categorical_strategy (str): Strategy for categorical imputation.
-        """
-        self.numeric_imputer: TransformerMixin = ImputerFactory.get_imputer(numeric_strategy)
-        self.categorical_imputer: TransformerMixin = ImputerFactory.get_imputer(categorical_strategy)
+        self.numeric_strategy = numeric_strategy
+        self.categorical_strategy = categorical_strategy
+        self.numeric_imputer: TransformerMixin = self._get_imputer(numeric_strategy)
+        self.categorical_imputer: TransformerMixin = self._get_imputer(categorical_strategy)
         self.numeric_cols: List[str] = []
         self.categorical_cols: List[str] = []
+        self._fitted = False
+
+    def _get_imputer(self, strategy: str) -> TransformerMixin:
+        strategy = strategy.lower()
+        if strategy == "mean":
+            return SimpleImputer(strategy="mean")
+        elif strategy == "median":
+            return SimpleImputer(strategy="median")
+        elif strategy in ("mode", "most_frequent"):
+            return SimpleImputer(strategy="most_frequent")
+        elif strategy == "knn":
+            return KNNImputer(n_neighbors=5)
+        elif strategy == "iterative":
+            return IterativeImputer(random_state=42)
+        else:
+            raise ValueError(f"Unsupported strategy: {strategy}")
 
     def fit(self, df: pd.DataFrame) -> None:
-        """
-        Fit imputers to the respective column types.
-
-        Args:
-            df (pd.DataFrame): Input DataFrame with missing values.
-
-        Raises:
-            ValueError: If input DataFrame is empty.
-        """
         if df.empty:
             raise ValueError("Input DataFrame is empty.")
 
@@ -140,49 +146,23 @@ class DataImputer:
 
         if self.numeric_cols:
             self.numeric_imputer.fit(df[self.numeric_cols])
-        else:
-            print("No numeric columns to impute.")
-
         if self.categorical_cols:
             self.categorical_imputer.fit(df[self.categorical_cols])
-        else:
-            print("No categorical columns to impute.")
+
+        self._fitted = True
 
     def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Apply the fitted imputers to the DataFrame.
-
-        Args:
-            df (pd.DataFrame): Input DataFrame to transform.
-
-        Returns:
-            pd.DataFrame: Transformed DataFrame with missing values imputed.
-
-        Raises:
-            ValueError: If DataFrame is empty or not fitted first.
-        """
-        if df.empty:
-            raise ValueError("Input DataFrame is empty.")
+        if not self._fitted:
+            raise RuntimeError("You must call fit() before transform().")
 
         df_copy = df.copy()
-
         if self.numeric_cols:
             df_copy[self.numeric_cols] = self.numeric_imputer.transform(df_copy[self.numeric_cols])
-
         if self.categorical_cols:
             df_copy[self.categorical_cols] = self.categorical_imputer.transform(df_copy[self.categorical_cols])
-
         return df_copy
 
     def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        """
-        Fit the imputers and transform the data in one step.
-
-        Args:
-            df (pd.DataFrame): Input DataFrame with missing values.
-
-        Returns:
-            pd.DataFrame: Imputed DataFrame.
-        """
         self.fit(df)
         return self.transform(df)
+

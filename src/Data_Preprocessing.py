@@ -14,7 +14,7 @@ from sklearn.preprocessing import StandardScaler, OrdinalEncoder, OneHotEncoder
 from sklearn.impute import SimpleImputer
 
 from Common_Utils import setup_logger, track_performance, CustomException, load_yaml
-from Model_Utils.feature_nan_imputation import ImputerFactory
+from Model_Utils.feature_nan_imputation import DataImputer
 from Model_Utils.feature_outlier_handling import OutlierHandler
 from Model_Utils.feature_scaling import ScalerFactory
 from Common_Utils.sqlite_handler import SQLiteStrategy
@@ -34,7 +34,7 @@ tuned_model_dir.mkdir(exist_ok=True, parents=True)
 # -------------------- Constants --------------------
 target_column: str = config["Data_Preprocessing"]["const"]["target_column"]
 imputation_method: str = config["Data_Preprocessing"]["const"]["imputation_method"]
-outlier_method: str = config["Data_Preprocessing"]["const"]["outlier_method"]
+outlier_handle_method: str = config["Data_Preprocessing"]["const"]["outlier_method"]
 iqr_threshold: float = config["Data_Preprocessing"]["const"]["iqr_threshold"]
 scaler_type: str = config["Data_Preprocessing"]["const"].get("scaler", "standard")
 
@@ -59,61 +59,6 @@ class RemoveDuplicatesStrategy(PreprocessingStrategy):
 class DropHighMissingStrategy(PreprocessingStrategy):
     def apply(self, df: pd.DataFrame) -> pd.DataFrame:
         return df.dropna(axis=1, thresh=int(0.5 * len(df)))
-
-class ImputeMissingValuesStrategy(PreprocessingStrategy):
-    def __init__(self, method: str):
-        self.numeric_imputer = ImputerFactory.get_imputer(method)
-        self.cat_imputer = SimpleImputer(strategy="most_frequent")
-        self.numeric_cols = []
-        self.cat_cols = []
-
-    def fit_transform(self, df: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
-        if isinstance(df, pd.Series):
-            result = self.cat_imputer.fit_transform(df.to_frame())
-            return pd.Series(result.ravel(), name=df.name, index=df.index)
-
-        self.numeric_cols = df.select_dtypes(include='number').columns.tolist()
-        self.cat_cols = df.select_dtypes(include='object').columns.tolist()
-
-        if self.numeric_cols:
-            df[self.numeric_cols] = self.numeric_imputer.fit_transform(df[self.numeric_cols])
-        if self.cat_cols:
-            df[self.cat_cols] = self.cat_imputer.fit_transform(df[self.cat_cols])
-        return df
-
-    def transform(self, df: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
-        if isinstance(df, pd.Series):
-            result = self.cat_imputer.transform(df.to_frame())
-            return pd.Series(result.ravel(), name=df.name, index=df.index)
-
-        if self.numeric_cols:
-            df[self.numeric_cols] = self.numeric_imputer.transform(df[self.numeric_cols])
-        if self.cat_cols:
-            df[self.cat_cols] = self.cat_imputer.transform(df[self.cat_cols])
-        return df
-
-    def apply(self, df: Union[pd.DataFrame, pd.Series]) -> Union[pd.DataFrame, pd.Series]:
-        return self.fit_transform(df)
-
-class OutlierTransformStrategy(PreprocessingStrategy):
-    def __init__(self, method: str, iqr_threshold: float):
-        self.method = method
-        self.iqr_threshold = iqr_threshold
-        self.handler = None
-        self.numeric_cols = []
-
-    def fit_transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        self.numeric_cols = df.select_dtypes(include='number').columns.tolist()
-        self.handler = OutlierHandler(df[self.numeric_cols], iqr_threshold=self.iqr_threshold)
-        df[self.numeric_cols] = self.handler.transform(self.method)
-        return df
-
-    def transform(self, df: pd.DataFrame) -> pd.DataFrame:
-        df[self.numeric_cols] = self.handler.transform(self.method)
-        return df
-
-    def apply(self, df: pd.DataFrame) -> pd.DataFrame:
-        return self.fit_transform(df)
 
 class PreprocessingContext:
     def __init__(self, df: pd.DataFrame):
@@ -150,32 +95,29 @@ def execute_data_preprocessing() -> None:
 
         # Train-Val-Test Split
         X = df_clean.drop(columns=[target_column])
-        y = df_clean[target_column]
+        y = df_clean[[target_column]]
         X_train, X_temp, y_train, y_temp = train_test_split(X, y, test_size=0.4, stratify=y, random_state=42)
         X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=0.5, stratify=y_temp, random_state=42)
 
         # Imputation & Outlier Transformation
-        imputer = ImputeMissingValuesStrategy(imputation_method)
-        outlier = OutlierTransformStrategy(outlier_method, iqr_threshold)
+        x_imp, y_imp = DataImputer(numeric_strategy="mean"), DataImputer()
+        X_train_impute = x_imp.fit_transform(X_train)
+        y_train_impute = y_imp.fit_transform(y_train)
+        X_val_impute = x_imp.transform(X_val)
+        y_val_impute = y_imp.transform(y_val)
+        X_test_impute = x_imp.transform(X_test)
+        y_test_impute = y_imp.transform(y_test)
 
-        X_train = imputer.apply(X_train)
-        X_val = imputer.transform(X_val)
-        X_test = imputer.transform(X_test)
+        outlier_handler = OutlierHandler(iqr_threshold=1.5)
+        X_train = outlier_handler.fit_transform(X_train_impute,outlier_handle_method)
+        X_val = outlier_handler.transform(X_val_impute, outlier_handle_method)
+        X_test = outlier_handler.transform(X_test_impute, outlier_handle_method)
 
-        X_train = outlier.apply(X_train)
-        X_val = outlier.transform(X_val)
-        X_test = outlier.transform(X_test)
-
-        y_train = imputer.apply(y_train)
-        y_val = imputer.transform(y_val)
-        y_test = imputer.transform(y_test)
 
         # Convert target to binary
-        y_train = y_train.map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
-        y_val = y_val.map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
-        y_test = y_test.map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
-
-        y_train.name = y_val.name = y_test.name = "Attrition_Flag"
+        y_train = y_train_impute.iloc[:, 0].map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
+        y_val = y_val_impute.iloc[:, 0].map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
+        y_test = y_test_impute.iloc[:, 0].map({"Existing Customer": 0, "Attrited Customer": 1}).astype(int)
 
         # Encoding + Scaling Pipeline
         encoding_transformer = ColumnTransformer([
@@ -206,6 +148,8 @@ def execute_data_preprocessing() -> None:
         y_test.to_csv(output_dir / "y_test.csv", index=False)
 
         # Save pipeline & feature names
+        joblib.dump(x_imp, tuned_model_dir / "x_imputer.joblib")
+        joblib.dump(outlier_handler, tuned_model_dir / "outlier_handler.joblib")
         joblib.dump(full_pipeline, tuned_model_dir / "encoder_scaler.joblib")
         with open(tuned_model_dir / "feature_names.json", "w") as f:
             json.dump(feature_names.tolist(), f)

@@ -1,0 +1,9 @@
+[2025-06-22 12:57:42,148] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-22 12:57:42,148] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-22 12:57:42,148] 100 __init__.py - INFO - Running 'execute_data_preprocessing'...
+[2025-06-22 12:57:42,148] 80 Data_Preprocessing.py - INFO - Starting Data Preprocessing...
+[2025-06-22 12:57:42,148] 36 sqlite_handler.py - INFO - Connected to SQLite DB at Data\data.db
+[2025-06-22 12:57:42,295] 96 sqlite_handler.py - INFO - Executed read query. Rows fetched: 10127
+[2025-06-22 12:57:43,453] 157 Data_Preprocessing.py - INFO - Preprocessing and saving completed successfully.
+[2025-06-22 12:57:43,485] 111 __init__.py - INFO - 'execute_data_preprocessing' completed in 1.3376 sec
+[2025-06-22 12:57:43,486] 112 __init__.py - INFO - Memory used: 676.36 KB (peak: 35182.79 KB)
