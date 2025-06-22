@@ -3,217 +3,170 @@ from sklearn.feature_selection import SelectKBest, VarianceThreshold, f_classif
 from sklearn.decomposition import KernelPCA
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis as LDA
 import pandas as pd
-from typing import Optional, Union, List, Dict
+from typing import Optional, List
 
+
+# -------------------- Abstract Base --------------------
 
 class FeatureProcessor(ABC):
     """
     Abstract base class for feature selection or extraction strategies.
+    All subclasses must implement fit() and transform().
     """
+
     @abstractmethod
-    def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
-        """
-        Apply the feature processing strategy.
-
-        Args:
-            X (pd.DataFrame): Feature matrix.
-            y (Optional[pd.Series]): Target variable if required.
-
-        Returns:
-            pd.DataFrame: Transformed feature matrix.
-        """
+    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
         pass
 
     @abstractmethod
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        """
-        Transform the input data using the fitted feature processor.
-
-        Args:
-            X (pd.DataFrame): The input feature matrix to transform.
-
-        Returns:
-            pd.DataFrame: The transformed feature matrix.
-        """
         pass
 
-    def get_selected_columns(self) -> Optional[List[str]]:
-        raise NotImplementedError("This processor does not support 'get_selected_columns()'")
-# ========================== Selection Strategies ===========================
+    def fit_transform(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        self.fit(X, y)
+        return self.transform(X)
 
-class SelectKBestStrategy(FeatureProcessor):
+
+# -------------------- Feature Selection --------------------
+
+class SelectKBestProcessor(FeatureProcessor):
+    """
+    Feature selection using SelectKBest with f_classif (ANOVA F-test).
+    """
+
     def __init__(self, k: int = 5):
-        self.k = k
-        self.selector = SelectKBest(score_func=f_classif, k=self.k)
-        self.selected_columns = None
-        self.is_fitted = False
+        self.selector = SelectKBest(score_func=f_classif, k=k)
+        self.selected_columns: Optional[List[str]] = None
 
-    def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
+    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
         if y is None:
-            raise ValueError("Target variable 'y' is required for SelectKBest.")
-        if X.empty:
-            raise ValueError("Input DataFrame 'X' is empty.")
-        
-        X_new = self.selector.fit_transform(X, y)
+            raise ValueError("SelectKBest requires target variable y.")
+        if X.empty or y.empty:
+            raise ValueError("Input data X or y is empty.")
+        self.selector.fit(X, y.values.ravel())
         self.selected_columns = X.columns[self.selector.get_support()].tolist()
-        self.is_fitted = True
-        
-        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        if not self.is_fitted or self.selected_columns is None:
-            raise ValueError("You must call process() before transform().")
-        
-        X_selected = X[self.selected_columns]
-        X_new = self.selector.transform(X_selected)
-        
-        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
+        if not self.selected_columns:
+            raise ValueError("Call fit() before transform().")
+        return pd.DataFrame(self.selector.transform(X[self.selected_columns]),
+                            columns=self.selected_columns, index=X.index)
 
-    def get_support(self, indices: bool = False):
-        if not self.is_fitted:
-            raise ValueError("Call process() before get_support().")
-        return self.selector.get_support(indices=indices)
-
-    def get_selected_columns(self) -> Optional[list]:
-        return self.selected_columns
+    def fit_transform(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        self.fit(X, y)
+        return self.transform(X)
 
 
-class VarianceThresholdStrategy(FeatureProcessor):
+class VarianceThresholdProcessor(FeatureProcessor):
     """
-    Removes features with variance below a certain threshold.
+    Feature selection by removing low-variance features.
     """
+
     def __init__(self, threshold: float = 0.0):
-        self.selector = VarianceThreshold(threshold=threshold)
-        self.selected_columns = None
-        self.is_fitted = False
+        self.selector = VarianceThreshold(threshold)
+        self.selected_columns: Optional[List[str]] = None
 
-    def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
+    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
         if X.empty:
-            raise ValueError("Input DataFrame 'X' is empty.")
-        X_new = self.selector.fit_transform(X)
-        self.selected_columns = X.columns[self.selector.get_support()]
-        self.is_fitted = True
-        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
+            raise ValueError("Input data X is empty.")
+        self.selector.fit(X)
+        self.selected_columns = X.columns[self.selector.get_support()].tolist()
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        if not self.is_fitted:
-            raise ValueError("You must call `process()` before `transform()`.")
-        if X.empty:
-            raise ValueError("Input DataFrame 'X' is empty.")
-        X_new = self.selector.transform(X)
-        return pd.DataFrame(X_new, columns=self.selected_columns, index=X.index)
+        if not self.selected_columns:
+            raise ValueError("Call fit() before transform().")
+        return pd.DataFrame(self.selector.transform(X[self.selected_columns]),
+                            columns=self.selected_columns, index=X.index)
 
-# ========================== Extraction Strategies ===========================
+    def fit_transform(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        self.fit(X, y)
+        return self.transform(X)
 
-class LDAStrategy(FeatureProcessor):
+
+# -------------------- Feature Extraction --------------------
+
+class LDAProcessor(FeatureProcessor):
     """
-    Applies Linear Discriminant Analysis for dimensionality reduction.
+    Linear Discriminant Analysis (LDA) for supervised feature extraction.
     """
+
     def __init__(self, n_components: Optional[int] = None):
-        self.n_components = n_components
-        self.lda = LDA(n_components=self.n_components)
-        self.columns = None
-        self.is_fitted = False
+        self.lda = LDA(n_components=n_components)
+        self.columns: Optional[List[str]] = None
 
-    def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
+    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
         if y is None:
-            raise ValueError("Target variable 'y' is required for LDA.")
-        if X.empty:
-            raise ValueError("Input DataFrame 'X' is empty.")
-        X_new = self.lda.fit_transform(X, y)
-        if X_new.ndim == 1:
-            X_new = X_new.reshape(-1, 1)
-        self.columns = [f'LDA{i+1}' for i in range(X_new.shape[1])]
-        self.is_fitted = True
-        return pd.DataFrame(X_new, columns=self.columns, index=X.index)
+            raise ValueError("LDA requires target variable y.")
+        if X.empty or y.empty:
+            raise ValueError("Input data X or y is empty.")
+        X_new = self.lda.fit_transform(X, y.values.ravel())
+        self.columns = [f"LDA{i + 1}" for i in range(X_new.shape[1])]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        if not self.is_fitted:
-            raise ValueError("You must call `process()` before `transform()`.")
-        if X.empty:
-            raise ValueError("Input DataFrame 'X' is empty.")
+        if not self.columns:
+            raise ValueError("Call fit() before transform().")
         X_new = self.lda.transform(X)
-        if X_new.ndim == 1:
-            X_new = X_new.reshape(-1, 1)
         return pd.DataFrame(X_new, columns=self.columns, index=X.index)
 
-    
-class KernelPCAStrategy(FeatureProcessor):
-    """
-    Applies Kernel PCA transformation for nonlinear feature extraction.
-    """
-    def __init__(self, n_components: int = 15, kernel: str = 'rbf'):
-        self.n_components = n_components
-        self.kernel = kernel
-        self.kpca = KernelPCA(n_components=self.n_components, kernel=self.kernel, random_state=42)
-        self.input_columns: Optional[List[str]] = None
-        self.component_names: Optional[List[str]] = None
-        self.is_fitted: bool = False
+    def fit_transform(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        self.fit(X, y)
+        return self.transform(X)
 
-    def process(self, X: pd.DataFrame, y: Optional[pd.Series] = None) -> pd.DataFrame:
+
+class KernelPCAProcessor(FeatureProcessor):
+    """
+    Kernel PCA for nonlinear dimensionality reduction.
+    """
+
+    def __init__(self, n_components: int = 10, kernel: str = 'rbf'):
+        self.kpca = KernelPCA(n_components=n_components, kernel=kernel, random_state=42)
+        self.columns: Optional[List[str]] = None
+        self.input_columns: Optional[List[str]] = None
+
+    def fit(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None):
         if X.empty:
-            raise ValueError("Input DataFrame 'X' is empty.")
-        
+            raise ValueError("Input data X is empty.")
         self.input_columns = X.columns.tolist()
         X_new = self.kpca.fit_transform(X)
-        self.component_names = [f'KPC{i+1}' for i in range(self.n_components)]
-        self.is_fitted = True
-
-        return pd.DataFrame(X_new, columns=self.component_names, index=X.index)
+        self.columns = [f"KPC{i + 1}" for i in range(X_new.shape[1])]
 
     def transform(self, X: pd.DataFrame) -> pd.DataFrame:
-        if not self.is_fitted:
-            raise ValueError("You must call process() before transform().")
-        
+        if not self.columns or not self.input_columns:
+            raise ValueError("Call fit() before transform().")
         X = X[self.input_columns]
         X_new = self.kpca.transform(X)
-        
-        return pd.DataFrame(X_new, columns=self.component_names, index=X.index)
+        return pd.DataFrame(X_new, columns=self.columns, index=X.index)
 
-    def get_components(self) -> Optional[List[str]]:
-        return self.component_names
+    def fit_transform(self, X: pd.DataFrame, y: Optional[pd.DataFrame] = None) -> pd.DataFrame:
+        self.fit(X, y)
+        return self.transform(X)
 
 
-# ============================ Strategy Factory ============================
+# -------------------- Feature Factory --------------------
 
 class FeatureFactory:
     """
-    Factory class for creating feature processors for selection or extraction.
+    Factory for creating feature processors.
+
+    Usage:
+        FeatureFactory.get_processor(kind="selection", method="selectkbest", k=10)
     """
+
     @staticmethod
     def get_processor(kind: str, method: str, **kwargs) -> FeatureProcessor:
-        """
-        Instantiates the requested feature processor.
-
-        Args:
-            kind (str): Either 'selection' or 'extraction'.
-            method (str): Name of the method to apply.
-            kwargs: Additional parameters for the processor.
-
-        Returns:
-            FeatureProcessor: An instance of a feature processor.
-
-        Raises:
-            ValueError: If an unsupported kind or method is specified.
-        """
         kind = kind.lower()
         method = method.lower()
 
         if kind == 'selection':
             if method == 'selectkbest':
-                return SelectKBestStrategy(**kwargs)
+                return SelectKBestProcessor(**kwargs)
             elif method == 'variancethreshold':
-                return VarianceThresholdStrategy(**kwargs)
-            else:
-                raise ValueError(f"Unknown selection method '{method}'")
-        
+                return VarianceThresholdProcessor(**kwargs)
+
         elif kind == 'extraction':
             if method == 'lda':
-                return LDAStrategy(**kwargs)
+                return LDAProcessor(**kwargs)
             elif method == 'kernelpca':
-                return KernelPCAStrategy(**kwargs)
-            else:
-                raise ValueError(f"Unknown extraction method '{method}'")
-        
-        else:
-            raise ValueError(f"Unknown feature processor kind '{kind}'")
+                return KernelPCAProcessor(**kwargs)
+
+        raise ValueError(f"Unknown kind '{kind}' or method '{method}'.")
