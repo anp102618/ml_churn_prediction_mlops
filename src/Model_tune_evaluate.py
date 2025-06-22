@@ -6,7 +6,7 @@ import pandas as pd
 import joblib
 from pathlib import Path
 from typing import Optional, List, Dict, Any
-
+from sklearn.base import BaseEstimator
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from sklearn.model_selection import StratifiedKFold
 from skopt import BayesSearchCV
@@ -49,6 +49,19 @@ def get_search_space(param_grid: Dict[str, List[Any]]) -> Dict[str, Any]:
             search_space[key] = Categorical(values)
     return search_space
 
+def prepare_features_for_model(
+    raw_df: pd.DataFrame,
+    encoder_scaler,
+    selector,
+    extractor,
+    expected_columns: list
+) -> pd.DataFrame:
+    encoded = encoder_scaler.transform(raw_df)
+    encoded = pd.DataFrame(encoded, columns=encoder_scaler.get_feature_names_out(), index=raw_df.index)
+    encoded = encoded.reindex(columns=expected_columns, fill_value=0)
+    selected = selector.transform(encoded)
+    extracted = extractor.transform(selected)
+    return extracted
 
 class ClassificationModelTuner:
     def __init__(self, config_path: Path, allowed_models: Optional[List[str]] = None):
@@ -99,9 +112,10 @@ class ClassificationModelTuner:
                 X_sampled, y_sampled = sampler.sample(self.X_train, self.y_train)
                 X_selected = selector.process(X_sampled, y_sampled)
                 selected_columns = selector.get_selected_columns()
+                print(selected_columns)
+                print(X_selected.columns)
                 X_extracted = extractor.process(X_selected, y_sampled)
-                X_extracted_df = pd.DataFrame(X_extracted)
-
+                print(X_extracted.columns)
                 logger.info(f"Feature Engineering completed..")
 
                 logger.info(f"Starting model tuning..")
@@ -117,17 +131,17 @@ class ClassificationModelTuner:
                     random_state=42
                 )
                 opt.fit(X_extracted, y_sampled)
-                best_model = opt.best_estimator_
+                best_model : BaseEstimator  = opt.best_estimator_
                 best_params = opt.best_params_
 
                 logger.info(f"initial model tuning finished..")
 
                 logger.info(f"Starting model fine tuning on (train+val)..")
-                X_val_resampled = self.X_val.copy()  
-                X_val_selected = selector.transform(X_val_resampled[selected_columns])
-                X_val_extracted = extractor.transform(X_val_selected)
-
-                X_finetune = np.concatenate([X_extracted_df, X_val_extracted], axis=0)
+                encoder_scaler = joblib.load("Tuned_Model/encoder_scaler.joblib")
+                X_val_extracted = prepare_features_for_model(self.X_val, encoder_scaler, selector, extractor, self.X_train.columns)
+                logger.info("x_val extracted successfully")
+                
+                X_finetune = np.concatenate([X_extracted, X_val_extracted], axis=0)
                 y_finetune = np.concatenate([y_sampled, self.y_val], axis=0)
                 best_model.fit(X_finetune, y_finetune)
                 logger.info(f" model fine tuning on (train+val) completed..")
@@ -138,8 +152,7 @@ class ClassificationModelTuner:
                 joblib.dump(extractor, extractor_path)
                 logger.info(f"saved processor artifacts successfully..")
 
-                X_test_selected = selector.transform(self.X_test[selected_columns])
-                X_test_extracted = extractor.transform(X_test_selected)
+                X_test_extracted = prepare_features_for_model(self.X_test, encoder_scaler, selector, extractor, self.X_train.columns)
 
                 test_scores = self.evaluate_model(best_model, X_test_extracted, self.y_test)
 

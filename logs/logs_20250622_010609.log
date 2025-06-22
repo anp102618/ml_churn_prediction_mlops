@@ -1,0 +1,85 @@
+[2025-06-22 01:06:09,799] 123 __init__.py - INFO - Loaded config from Config_Yaml/classifiers.yaml
+[2025-06-22 01:06:10,450] 123 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-22 01:06:10,450] 100 __init__.py - INFO - Running 'execute_model_tune_evaluate'...
+[2025-06-22 01:06:10,450] 180 Model_Tune_Evaluate.py - INFO - Starting Classification Model Tuning...
+[2025-06-22 01:06:10,605] 100 __init__.py - INFO - Running 'run_grid_search'...
+[2025-06-22 01:06:10,664] 89 Model_Tune_Evaluate.py - INFO - Running Bayesian search for: logistic_regression
+[2025-06-22 01:06:10,690] 93 Model_Tune_Evaluate.py - INFO - Starting Feature Engineering..
+[2025-06-22 01:06:10,690] 97 Model_Tune_Evaluate.py - INFO - Feature selector and extractor initialized..
+[2025-06-22 01:08:58,076] 105 Model_Tune_Evaluate.py - INFO - Feature Engineering completed..
+[2025-06-22 01:08:58,076] 107 Model_Tune_Evaluate.py - INFO - Starting model tuning..
+[2025-06-22 01:09:27,781] 123 Model_Tune_Evaluate.py - INFO - initial model tuning finished..
+[2025-06-22 01:09:27,781] 125 Model_Tune_Evaluate.py - INFO - Starting model fine tuning on (train+val)..
+[2025-06-22 01:09:27,816] 163 Model_Tune_Evaluate.py - ERROR - Bayesian search failed.
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 131, in run_grid_search
+    X_val_selected = selector.transform(X_val_resampled)
+  File "d:\ml_churn_prediction_mlops\Model_Utils\feature_selection_extraction.py", line 68, in transform
+    X_new = self.selector.transform(X_selected)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\feature_selection\_base.py", line 107, in transform
+    X = validate_data(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2919, in validate_data
+    _check_feature_names(_estimator, X, reset=reset)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2777, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- ohe__Marital_Status_Unknown
+- ord__Income_Category
+- remainder__Months_on_book
+
+[2025-06-22 01:09:27,837] 186 Model_Tune_Evaluate.py - CRITICAL - Fatal error in classifier tuning pipeline.
+[2025-06-22 01:09:27,843] 90 __init__.py - CRITICAL - Unhandled Exception
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 131, in run_grid_search
+    X_val_selected = selector.transform(X_val_resampled)
+  File "d:\ml_churn_prediction_mlops\Model_Utils\feature_selection_extraction.py", line 68, in transform
+    X_new = self.selector.transform(X_selected)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\_set_output.py", line 319, in wrapped
+    data_to_wrap = f(self, X, *args, **kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\feature_selection\_base.py", line 107, in transform
+    X = validate_data(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2919, in validate_data
+    _check_feature_names(_estimator, X, reset=reset)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\sklearn\utils\validation.py", line 2777, in _check_feature_names
+    raise ValueError(message)
+ValueError: The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- ohe__Marital_Status_Unknown
+- ord__Income_Category
+- remainder__Months_on_book
+
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 182, in execute_model_tune_evaluate
+    tuner.run_grid_search()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 164, in run_grid_search
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [131] - Message: [The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- ohe__Marital_Status_Unknown
+- ord__Income_Category
+- remainder__Months_on_book
+]
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 191, in <module>
+    execute_model_tune_evaluate()
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 105, in wrapper
+    result = func(*args, **kwargs)
+  File "D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py", line 187, in execute_model_tune_evaluate
+    raise CustomException(e, sys)
+Common_Utils.CustomException: Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [182] - Message: [Error in script: [D:\ml_churn_prediction_mlops\src\Model_Tune_Evaluate.py] at line [131] - Message: [The feature names should match those that were passed during fit.
+Feature names seen at fit time, yet now missing:
+- ohe__Marital_Status_Unknown
+- ord__Income_Category
+- remainder__Months_on_book
+]]

@@ -36,6 +36,9 @@ class FeatureProcessor(ABC):
             pd.DataFrame: The transformed feature matrix.
         """
         pass
+
+    def get_selected_columns(self) -> Optional[List[str]]:
+        raise NotImplementedError("This processor does not support 'get_selected_columns()'")
 # ========================== Selection Strategies ===========================
 
 class SelectKBestStrategy(FeatureProcessor):

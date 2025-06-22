@@ -3,7 +3,6 @@ from typing import Tuple, Union
 import numpy as np
 import pandas as pd
 
-from sklearn.base import BaseEstimator
 from imblearn.over_sampling import RandomOverSampler, SMOTE
 from imblearn.under_sampling import RandomUnderSampler
 
@@ -11,58 +10,78 @@ from imblearn.under_sampling import RandomUnderSampler
 class SamplingStrategy(ABC):
     """
     Abstract base class for sampling strategies.
-    Each strategy must implement the `sample` method.
+    All derived classes must implement `fit_resample`.
     """
+
     @abstractmethod
-    def sample(self, X: Union[pd.DataFrame, np.ndarray],
+    def fit_resample(self,
+                     X: Union[pd.DataFrame, np.ndarray],
                      y: Union[pd.Series, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
+        """
+        Resample the dataset to handle class imbalance.
+
+        Args:
+            X (Union[pd.DataFrame, np.ndarray]): Features.
+            y (Union[pd.Series, np.ndarray]): Target labels.
+
+        Returns:
+            Tuple[np.ndarray, np.ndarray]: Resampled X and y.
+        """
         pass
 
 
 class NoSamplingStrategy(SamplingStrategy):
     """
-    No sampling is applied; returns X and y unchanged.
+    No resampling applied. Returns X and y unchanged.
     """
-    def sample(self, X, y):
+    def fit_resample(self,
+                     X: Union[pd.DataFrame, np.ndarray],
+                     y: Union[pd.Series, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
         return X, y
 
 
 class RandomUnderSamplerStrategy(SamplingStrategy):
     """
-    Undersamples the majority class using random sampling.
+    Random undersampling of the majority class.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.sampler = RandomUnderSampler()
 
-    def sample(self, X, y):
+    def fit_resample(self,
+                     X: Union[pd.DataFrame, np.ndarray],
+                     y: Union[pd.Series, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
         return self.sampler.fit_resample(X, y)
 
 
 class RandomOverSamplerStrategy(SamplingStrategy):
     """
-    Oversamples the minority class using random sampling.
+    Random oversampling of the minority class.
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.sampler = RandomOverSampler()
 
-    def sample(self, X, y):
+    def fit_resample(self,
+                     X: Union[pd.DataFrame, np.ndarray],
+                     y: Union[pd.Series, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
         return self.sampler.fit_resample(X, y)
 
 
 class SMOTESamplerStrategy(SamplingStrategy):
     """
-    Oversamples the minority class using SMOTE.
+    Synthetic Minority Over-sampling Technique (SMOTE).
     """
-    def __init__(self):
+    def __init__(self) -> None:
         self.sampler = SMOTE()
 
-    def sample(self, X, y):
+    def fit_resample(self,
+                     X: Union[pd.DataFrame, np.ndarray],
+                     y: Union[pd.Series, np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
         return self.sampler.fit_resample(X, y)
 
 
 class SamplingFactory:
     """
-    Factory class for creating a sampling strategy instance based on a given name.
+    Factory for creating sampling strategy instances.
 
     Supported strategies:
         - "none"
@@ -74,16 +93,16 @@ class SamplingFactory:
     @staticmethod
     def get_sampler(strategy: str) -> SamplingStrategy:
         """
-        Returns a sampling strategy instance based on the given strategy name.
+        Create a SamplingStrategy instance based on the given strategy name.
 
         Args:
             strategy (str): Name of the sampling strategy.
 
         Returns:
-            SamplingStrategy: An instance implementing the sampling logic.
+            SamplingStrategy: A strategy instance implementing `fit_resample`.
 
         Raises:
-            ValueError: If an unsupported sampling strategy is provided.
+            ValueError: If strategy is not supported.
         """
         strategy = strategy.strip().lower()
 
@@ -96,5 +115,7 @@ class SamplingFactory:
         elif strategy == "smote":
             return SMOTESamplerStrategy()
         else:
-            raise ValueError(f"Unknown sampling strategy: '{strategy}'. "
-                             f"Supported: ['none', 'undersample', 'oversample', 'smote']")
+            raise ValueError(
+                f"Unknown sampling strategy: '{strategy}'. "
+                f"Supported: ['none', 'undersample', 'oversample', 'smote']"
+            )

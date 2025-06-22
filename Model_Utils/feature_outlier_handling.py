@@ -2,20 +2,20 @@ import numpy as np
 import pandas as pd
 from abc import ABC, abstractmethod
 from sklearn.preprocessing import PowerTransformer
-from typing import List, Optional
+from typing import List
 
 
 def find_outlier_columns(df: pd.DataFrame, threshold: float = 1.5) -> List[str]:
     """
     Identify numeric columns in the DataFrame that contain outliers
-    based on the Interquartile Range (IQR) method.
+    using the Interquartile Range (IQR) method.
 
     Args:
-        df (pd.DataFrame): The input dataframe.
+        df (pd.DataFrame): Input DataFrame.
         threshold (float): IQR threshold to detect outliers.
 
     Returns:
-        List[str]: List of column names with outliers.
+        List[str]: Column names with detected outliers.
     """
     if df.empty:
         return []
@@ -29,12 +29,13 @@ def find_outlier_columns(df: pd.DataFrame, threshold: float = 1.5) -> List[str]:
         IQR = Q3 - Q1
         lower = Q1 - threshold * IQR
         upper = Q3 + threshold * IQR
-
         if ((df[col] < lower) | (df[col] > upper)).any():
             outlier_cols.append(col)
 
     return outlier_cols
 
+
+# ---------------- Strategy Pattern ---------------- #
 
 class OutlierHandlerStrategy(ABC):
     """
@@ -43,14 +44,14 @@ class OutlierHandlerStrategy(ABC):
     @abstractmethod
     def handle(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
         """
-        Applies transformation to handle outliers on selected columns.
+        Apply transformation to handle outliers on specified columns.
 
         Args:
-            df (pd.DataFrame): The input dataframe.
-            columns (List[str]): List of columns to transform.
+            df (pd.DataFrame): Input DataFrame.
+            columns (List[str]): Columns to transform.
 
         Returns:
-            pd.DataFrame: Transformed dataframe.
+            pd.DataFrame: Transformed DataFrame.
         """
         pass
 
@@ -70,20 +71,19 @@ class LogTransformStrategy(OutlierHandlerStrategy):
             df_copy[col] = np.log(df_copy[col])
 
         if not applicable_cols:
-            print("No columns suitable for log transform (contain non-positive values).")
+            print("⚠️ No columns suitable for log transform (non-positive values present).")
 
         return df_copy
 
 
 class YeoJohnsonTransformStrategy(OutlierHandlerStrategy):
     """
-    Applies Yeo-Johnson transformation (handles zero and negative values).
+    Applies Yeo-Johnson transformation to handle both positive and negative values.
     """
     def handle(self, df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
         df_copy = df.copy()
-
         if not columns:
-            print("No columns detected with outliers for Yeo-Johnson transform.")
+            print("⚠️ No columns provided for Yeo-Johnson transform.")
             return df_copy
 
         try:
@@ -95,13 +95,15 @@ class YeoJohnsonTransformStrategy(OutlierHandlerStrategy):
         return df_copy
 
 
+# ---------------- Factory ---------------- #
+
 class OutlierHandlerFactory:
     """
-    Factory for selecting the appropriate outlier handling strategy.
+    Factory to create appropriate outlier transformation strategy.
     """
     @staticmethod
     def get_handler(strategy: str) -> OutlierHandlerStrategy:
-        strategy = strategy.lower().strip()
+        strategy = strategy.strip().lower()
         if strategy == 'log':
             return LogTransformStrategy()
         elif strategy == 'yeo':
@@ -110,43 +112,68 @@ class OutlierHandlerFactory:
             raise ValueError(f"Unknown strategy '{strategy}'. Supported: ['log', 'yeo'].")
 
 
+# ---------------- OutlierHandler Interface ---------------- #
+
 class OutlierHandler:
     """
-    Interface class that integrates outlier detection and transformation.
+    Handles outlier detection and transformation using a chosen strategy.
 
     Attributes:
-        df (pd.DataFrame): Input data.
-        iqr_threshold (float): Threshold for IQR-based outlier detection.
-        outlier_columns (List[str]): Columns containing outliers.
+        iqr_threshold (float): Threshold multiplier for IQR method.
+        outlier_columns (List[str]): Columns with detected outliers.
     """
-    def __init__(self, df: pd.DataFrame, iqr_threshold: float = 1.5):
-        if df.empty:
-            raise ValueError("Input DataFrame is empty.")
-        if not isinstance(df, pd.DataFrame):
-            raise TypeError("Expected input to be a pandas DataFrame.")
-
-        self.df: pd.DataFrame = df.copy()
+    def __init__(self, iqr_threshold: float = 1.5):
         self.iqr_threshold: float = iqr_threshold
-        self.outlier_columns: List[str] = find_outlier_columns(self.df, self.iqr_threshold)
+        self.outlier_columns: List[str] = []
+        self._strategy: OutlierHandlerStrategy = None
+        self._fitted: bool = False
 
-    def transform(self, strategy: str) -> pd.DataFrame:
+    def fit(self, df: pd.DataFrame) -> None:
         """
-        Applies the chosen transformation strategy to handle outliers.
+        Detects outlier columns in the DataFrame.
 
         Args:
-            strategy (str): Strategy to use ('log' or 'yeo').
+            df (pd.DataFrame): Input DataFrame.
+
+        Raises:
+            ValueError: If the DataFrame is empty.
+        """
+        if df.empty:
+            raise ValueError("Input DataFrame is empty.")
+
+        self.outlier_columns = find_outlier_columns(df, self.iqr_threshold)
+        self._fitted = True
+
+    def transform(self, df: pd.DataFrame, strategy: str) -> pd.DataFrame:
+        """
+        Transforms the DataFrame using the fitted outlier columns and strategy.
+
+        Args:
+            df (pd.DataFrame): DataFrame to transform.
+            strategy (str): Strategy to apply ("log", "yeo").
 
         Returns:
-            pd.DataFrame: DataFrame with transformed columns.
-        """
-        handler = OutlierHandlerFactory.get_handler(strategy)
-        return handler.handle(self.df, self.outlier_columns)
+            pd.DataFrame: Transformed DataFrame.
 
-    def get_outlier_columns(self) -> List[str]:
+        Raises:
+            ValueError: If `fit()` was not called before transform.
         """
-        Returns the list of columns identified as containing outliers.
+        if not self._fitted:
+            raise ValueError("You must call `fit()` before `transform()`.")
+
+        self._strategy = OutlierHandlerFactory.get_handler(strategy)
+        return self._strategy.handle(df, self.outlier_columns)
+
+    def fit_transform(self, df: pd.DataFrame, strategy: str) -> pd.DataFrame:
+        """
+        Convenience method to detect outliers and transform in one step.
+
+        Args:
+            df (pd.DataFrame): Input DataFrame.
+            strategy (str): Strategy to use ('log', 'yeo').
 
         Returns:
-            List[str]: List of outlier column names.
+            pd.DataFrame: Transformed DataFrame.
         """
-        return self.outlier_columns
+        self.fit(df)
+        return self.transform(df, strategy)
