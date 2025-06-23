@@ -244,25 +244,30 @@ def copy_selected_files1(source_dir: str, destination_dir: str, file_types: List
                 print(f"Copied: {src_file} -> {dest_file}")
 
 
-def delete_joblib_model(folder_path: str):
-    logger = setup_logger(filename="logs")
+def delete_joblib_model(file_path: str):
+    """
+    Deletes a specific .joblib file if it exists.
+
+    Args:
+        file_path (str): Full path to the .joblib file to be deleted.
+    """
+    logger = setup_logger("logs")
     try:
-        folder = Path(folder_path)
-        if not folder.is_dir():
-            raise ValueError(f"Provided path is not a directory: {folder}")
+        file = Path(file_path)
 
-        joblib_files = list(folder.rglob("*.joblib"))
-        if not joblib_files:
-            print("No .joblib files found.")
+        if not file.exists():
+            print(f"No such file: {file}")
             return
+        if not file.suffix == ".joblib":
+            raise ValueError(f"Not a .joblib file: {file}")
 
-        for file in joblib_files:
-            file.unlink()
-            logger.info(f"Deleted: {file}")
-            print(f"Deleted: {file.name}")
+        file.unlink()
+        logger.info(f"Deleted: {file}")
+        print(f"Deleted: {file.name}")
 
-    except CustomException as e:
-        logger.error(f"Error deleting joblib files: {e}")
+    except Exception as e:
+        logger.error(f"Error deleting joblib file: {e}")
+        raise CustomException(f"Error deleting joblib file: {e}")
     
 
 def convert(obj):

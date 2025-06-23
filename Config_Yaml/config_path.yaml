@@ -60,9 +60,17 @@ Model_Tune_Evaluate:
     tuned_model_yaml: Config_Yaml/tuned_models.yaml
     classifiers_yaml: Config_Yaml/classifiers.yaml
     
-
   const:
     allowed_models: ["logistic_regression","xgboost", "random_forest", "mlp"]
     random_state: 42
     main_metric: roc_auc
     bayes_search_iter: 20
+
+Experiment_Tracking_Prediction:
+  path:
+    tuned_model_yaml: Config_Yaml/tuned_models.yaml
+    mlflow_details_yaml: Tuned_Model/mlflow_details.yaml
+    processed_data_dir: Data/processed_data
+    joblib_model_dir: Tuned_Model
+
+  const:

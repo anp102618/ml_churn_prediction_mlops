@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/598318428555326310/3f67063d9a4a4e29a0ff47b637cbcf02/artifacts
+end_time: 1750666347348
+entry_point_name: ''
+experiment_id: '598318428555326310'
+lifecycle_stage: active
+run_id: 3f67063d9a4a4e29a0ff47b637cbcf02
+run_name: MLPClassifier_20250623_1342
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750666346185
+status: 3
+tags: []
+user_id: prasa

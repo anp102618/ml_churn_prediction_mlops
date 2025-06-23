@@ -1,0 +1,42 @@
+best_params:
+  activation: tanh
+  alpha: 0.0001
+  hidden_layer_sizes:
+  - 100
+  - 50
+  learning_rate_init: 0.01
+  max_iter: 200
+  solver: adam
+mlflow_run:
+  artifact_uri: mlflow-artifacts:/598318428555326310/3f67063d9a4a4e29a0ff47b637cbcf02/artifacts
+  end_time: null
+  experiment_id: '598318428555326310'
+  experiment_name: churn-classifier
+  model_uri: runs:/3f67063d9a4a4e29a0ff47b637cbcf02/model
+  run_id: 3f67063d9a4a4e29a0ff47b637cbcf02
+  run_name: MLPClassifier_20250623_1342
+  start_time: 1750666346185
+  status: RUNNING
+  tracking_uri: https://dagshub.com/anp102618/ml_churn_prediction_mlops.mlflow
+model: MLPClassifier
+saved_model_path: D:\ml_churn_prediction_mlops\Tuned_Model\model.joblib
+scores:
+  test:
+    accuracy: 0.9002961500493584
+    f1: 0.6873065015479877
+    precision: 0.69375
+    recall: 0.6809815950920245
+    roc_auc: 0.8116672681342477
+  train:
+    accuracy: 1.0
+    f1: 1.0
+    precision: 1.0
+    recall: 1.0
+    roc_auc: 1.0
+  val:
+    accuracy: 0.9422222222222222
+    f1: 0.828696925329429
+    precision: 0.7905027932960894
+    recall: 0.8707692307692307
+    roc_auc: 0.9133257918552037
+timestamp: '20250623_1342'

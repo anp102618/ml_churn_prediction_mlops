@@ -1,0 +1,8 @@
+[2025-06-23 12:24:47,660] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 12:24:47,660] 95 Experiment_Tracking_Prediction.py - INFO - MLflow tracking URI set to: https://dagshub.com/anp102618/ml_churn_prediction_mlops.mlflow
+[2025-06-23 12:24:47,730] 127 __init__.py - INFO - Loaded config from Config_Yaml\tuned_models.yaml
+[2025-06-23 12:24:47,730] 198 Experiment_Tracking_Prediction.py - ERROR - [UnhandledException] list indices must be integers or slices, not dict
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Experiment_Tracking_Prediction.py", line 100, in execute_mlflow_steps
+    best_model_info = config_model[best_model_key]
+TypeError: list indices must be integers or slices, not dict

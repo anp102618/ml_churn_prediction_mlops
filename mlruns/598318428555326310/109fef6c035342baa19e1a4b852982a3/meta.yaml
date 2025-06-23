@@ -1,0 +1,14 @@
+artifact_uri: mlflow-artifacts:/598318428555326310/109fef6c035342baa19e1a4b852982a3/artifacts
+end_time: 1750663828707
+entry_point_name: ''
+experiment_id: '598318428555326310'
+lifecycle_stage: active
+run_id: 109fef6c035342baa19e1a4b852982a3
+run_name: XGBClassifier_20250623_1300
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1750663827607
+status: 4
+tags: []
+user_id: prasa

@@ -1,0 +1,21 @@
+[2025-06-23 12:26:46,150] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 12:26:46,150] 95 Experiment_Tracking_Prediction.py - INFO - MLflow tracking URI set to: https://dagshub.com/anp102618/ml_churn_prediction_mlops.mlflow
+[2025-06-23 12:26:46,209] 127 __init__.py - INFO - Loaded config from Config_Yaml\tuned_models.yaml
+[2025-06-23 12:26:46,209] 111 Experiment_Tracking_Prediction.py - INFO - Using model: XGBClassifier with params: {'colsample_bytree': 1.0, 'gamma': 0, 'learning_rate': 0.1, 'max_depth': 6, 'n_estimators': 200, 'reg_alpha': 0.1, 'reg_lambda': 1.5, 'subsample': 0.8, 'tree_method': 'hist'}
+[2025-06-23 12:26:53,291] 204 Experiment_Tracking_Prediction.py - ERROR - [UnhandledException] API request to endpoint /api/2.0/mlflow/experiments/create failed with error code 403 != 200. Response body: ''
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Experiment_Tracking_Prediction.py", line 151, in execute_mlflow_steps
+    mlflow.set_experiment(experiment_name)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\mlflow\tracking\fluent.py", line 190, in set_experiment
+    experiment_id = client.create_experiment(experiment_name)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\mlflow\tracking\_tracking_service\client.py", line 275, in create_experiment
+    return self.store.create_experiment(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\mlflow\store\tracking\rest_store.py", line 186, in create_experiment
+    response_proto = self._call_endpoint(CreateExperiment, req_body)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\mlflow\store\tracking\rest_store.py", line 135, in _call_endpoint
+    return call_endpoint(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\mlflow\utils\rest_utils.py", line 590, in call_endpoint
+    response = verify_rest_response(response, endpoint)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\mlflow\utils\rest_utils.py", line 310, in verify_rest_response
+    raise MlflowException(
+mlflow.exceptions.MlflowException: API request to endpoint /api/2.0/mlflow/experiments/create failed with error code 403 != 200. Response body: ''

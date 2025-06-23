@@ -1,0 +1,12 @@
+[2025-06-23 13:01:17,499] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 13:01:17,499] 99 Experiment_Tracking_Prediction.py - INFO - MLflow tracking URI set to: https://dagshub.com/anp102618/ml_churn_prediction_mlops.mlflow
+[2025-06-23 13:01:17,546] 127 __init__.py - INFO - Loaded config from Config_Yaml\tuned_models.yaml
+[2025-06-23 13:01:17,546] 115 Experiment_Tracking_Prediction.py - INFO - Using model: XGBClassifier with params: {'colsample_bytree': 1.0, 'gamma': 0, 'learning_rate': 0.1, 'max_depth': 6, 'n_estimators': 200, 'reg_alpha': 0.1, 'reg_lambda': 1.5, 'subsample': 0.8, 'tree_method': 'hist'}
+[2025-06-23 13:01:20,333] 159 Experiment_Tracking_Prediction.py - INFO - Started MLflow run: 50c8be9f19ab40c4a7a14d0503d504b7
+[2025-06-23 13:01:21,425] 207 Experiment_Tracking_Prediction.py - ERROR - [UnhandledException] [Errno 2] No such file or directory: 'Data\\new_data\\model.joblib'
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Experiment_Tracking_Prediction.py", line 172, in execute_mlflow_steps
+    joblib.dump(model, model_copy_path)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\joblib\numpy_pickle.py", line 599, in dump
+    with open(filename, "wb") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'Data\\new_data\\model.joblib'

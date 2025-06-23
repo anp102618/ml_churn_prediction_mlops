@@ -1,0 +1,17 @@
+[2025-06-23 13:22:07,109] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 13:22:07,109] 99 Experiment_Tracking_Prediction.py - INFO - MLflow tracking URI set to: https://dagshub.com/anp102618/ml_churn_prediction_mlops.mlflow
+[2025-06-23 13:22:07,141] 127 __init__.py - INFO - Loaded config from Config_Yaml\tuned_models.yaml
+[2025-06-23 13:22:07,141] 115 Experiment_Tracking_Prediction.py - INFO - Using model: XGBClassifier with params: {'colsample_bytree': 1.0, 'gamma': 0, 'learning_rate': 0.1, 'max_depth': 6, 'n_estimators': 200, 'reg_alpha': 0.1, 'reg_lambda': 1.5, 'subsample': 0.8, 'tree_method': 'hist'}
+[2025-06-23 13:22:09,395] 207 Experiment_Tracking_Prediction.py - ERROR - [UnhandledException] The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Experiment_Tracking_Prediction.py", line 149, in execute_mlflow_steps
+    model.predict(X_test, y_test)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\xgboost\sklearn.py", line 1718, in predict
+    class_probs = super().predict(
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\prasa\anaconda3\envs\mlp-env\lib\site-packages\xgboost\sklearn.py", line 1330, in predict
+    predict_type="margin" if output_margin else "value",
+ValueError: The truth value of an array with more than one element is ambiguous. Use a.any() or a.all()

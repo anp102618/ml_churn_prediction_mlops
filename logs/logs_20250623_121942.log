@@ -1,0 +1,9 @@
+[2025-06-23 12:19:42,545] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 12:19:42,545] 95 Experiment_Tracking_Prediction.py - INFO - MLflow tracking URI set to: https://dagshub.com/anp102618/ml_churn_prediction_mlops.mlflow
+[2025-06-23 12:19:42,545] 198 Experiment_Tracking_Prediction.py - ERROR - [UnhandledException] [Errno 2] No such file or directory: 'Tuned_Model\\tuned_model.yaml'
+Traceback (most recent call last):
+  File "D:\ml_churn_prediction_mlops\src\Experiment_Tracking_Prediction.py", line 98, in execute_mlflow_steps
+    config_model = load_yaml(tuned_model_yaml)
+  File "d:\ml_churn_prediction_mlops\Common_Utils\__init__.py", line 125, in load_yaml
+    with open(path, "r") as f:
+FileNotFoundError: [Errno 2] No such file or directory: 'Tuned_Model\\tuned_model.yaml'

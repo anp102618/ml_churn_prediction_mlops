@@ -1,0 +1,6 @@
+artifact_location: mlflow-artifacts:/598318428555326310
+creation_time: 1750663827221
+experiment_id: '598318428555326310'
+last_update_time: 1750663827221
+lifecycle_stage: active
+name: churn-classifier
