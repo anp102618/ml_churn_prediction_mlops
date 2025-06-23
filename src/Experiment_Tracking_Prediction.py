@@ -94,8 +94,8 @@ def execute_mlflow_steps() -> None:
     try:
         os.environ["MLFLOW_TRACKING_USERNAME"] = os.getenv("DAGSHUB_USERNAME", "")
         os.environ["MLFLOW_TRACKING_PASSWORD"] = os.getenv("DAGSHUB_TOKEN", "")
-        #mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
-        mlflow.set_tracking_uri("http://127.0.0.1:5000")
+        mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+        #mlflow.set_tracking_uri("http://127.0.0.1:5000")
         logger.info(f"MLflow tracking URI set to: {MLFLOW_TRACKING_URI}")
 
         # Load best model config
