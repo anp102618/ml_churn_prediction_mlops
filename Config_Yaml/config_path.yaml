@@ -51,16 +51,18 @@ DataTransformation:
 
 Model_Tune_Evaluate:
   path:
-    processed_data_dir: Data/processed_data
+    X_train_path: "Data/processed_data/X_train.csv"
+    X_val_path: "Data/processed_data/X_val.csv"
+    X_test_path: "Data/processed_data/X_test.csv"
+    y_train_path: "Data/processed_data/y_train.csv"
+    y_val_path: "Data/processed_data/y_val.csv"
+    y_test_path: "Data/processed_data/y_test.csv"
     tuned_model_yaml: Config_Yaml/tuned_models.yaml
     classifiers_yaml: Config_Yaml/classifiers.yaml
-    selector_path: Tuned_Model/selector.joblib
-    extractor_path: Tuned_Model/extractor.joblib
+    
 
   const:
-    allowed_models: ["logistic_regression","xgboost"]
-    sampling: smote
-    selection: selectkbest
-    extraction: kernelpca
-    k: 20
-    n_components: 15
+    allowed_models: ["logistic_regression","xgboost", "random_forest", "mlp"]
+    random_state: 42
+    main_metric: roc_auc
+    bayes_search_iter: 20

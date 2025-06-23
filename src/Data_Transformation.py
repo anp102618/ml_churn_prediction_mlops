@@ -230,7 +230,14 @@ def execute_data_transformation() -> Tuple[pd.DataFrame, ...]:
         X_train_sel, X_val_sel, X_test_sel = context.select_features(X_train_samp, y_train_samp, X_val_enc, X_test_enc)
         X_train_final, X_val_final, X_test_final = context.extract_features(X_train_sel, X_val_sel, X_test_sel)
 
-        # Save final outputs
+        extracted_feature_names = [f"{extractor_method}_feat_{i}" for i in range(X_train_final.shape[1])]
+
+        # Convert NumPy arrays to DataFrames with column names and original index
+        X_train_final = pd.DataFrame(X_train_final, columns=extracted_feature_names, index=X_train_sel.index)
+        X_val_final   = pd.DataFrame(X_val_final,   columns=extracted_feature_names, index=X_val_sel.index)
+        X_test_final  = pd.DataFrame(X_test_final,  columns=extracted_feature_names, index=X_test_sel.index)
+
+                # Save final outputs
         X_train_final.to_csv(processed_data_folder / "X_train.csv", index=False)
         X_val_final.to_csv(processed_data_folder / "X_val.csv", index=False)
         X_test_final.to_csv(processed_data_folder / "X_test.csv", index=False)
@@ -242,7 +249,8 @@ def execute_data_transformation() -> Tuple[pd.DataFrame, ...]:
         logger.info("Data Transformation execution completed.")
 
     except Exception as e:
-        raise CustomException("Data Transformation execution failed", e)
+        logger.error(f"Data Transformation execution failed")
+        raise CustomException(e, sys)
 
 # -------------------- Entry --------------------
 if __name__ == "__main__":

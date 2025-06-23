@@ -1,6 +1,8 @@
 # common_utils/__init__.py
 import os
 import sys
+import pandas as pd
+import numpy as np
 from datetime import datetime
 import time
 import tracemalloc
@@ -9,7 +11,9 @@ import yaml
 from pathlib import Path
 import shutil
 import logging
-from typing import List
+from typing import List,Dict, Any
+import collections
+from skopt.space import Real, Integer, Categorical
 
 # ─────────────── Global Paths ───────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
@@ -261,6 +265,21 @@ def delete_joblib_model(folder_path: str):
         logger.error(f"Error deleting joblib files: {e}")
     
 
+def convert(obj):
+    """Recursively convert numpy, pandas, and ordered dicts to plain types."""
+    if isinstance(obj, (np.generic,)):
+        return obj.item()
+    elif isinstance(obj, dict):
+        return {k: convert(v) for k, v in obj.items()}
+    elif isinstance(obj, list):
+        return [convert(i) for i in obj]
+    elif isinstance(obj, tuple):
+        return tuple(convert(i) for i in obj)
+    elif isinstance(obj, collections.OrderedDict):
+        return dict(obj)
+    return obj
+
+
 
 # ─── Exports ──────────────────────────────────────
-__all__ = ["setup_logger", "CustomException", "track_performance", "load_yaml", "write_yaml", "append_yaml", "copy_csv_file", "copy_selected_files", "delete_joblib_model"]
+__all__ = ["setup_logger", "CustomException", "track_performance", "load_yaml", "write_yaml", "append_yaml", "copy_csv_file", "copy_selected_files", "delete_joblib_model","convert"]

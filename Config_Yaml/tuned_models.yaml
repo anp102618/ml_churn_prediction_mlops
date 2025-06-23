@@ -1,0 +1,114 @@
+- model_key: xgboost
+  model_name: XGBClassifier
+  best_params:
+    colsample_bytree: 1.0
+    gamma: 0
+    learning_rate: 0.1
+    max_depth: 6
+    n_estimators: 200
+    reg_alpha: 0.1
+    reg_lambda: 1.5
+    subsample: 0.8
+    tree_method: hist
+  scores:
+    train:
+      accuracy: 0.9930392156862745
+      precision: 0.9889169745284854
+      recall: 0.9972549019607844
+      f1: 0.9930684369813532
+      roc_auc: 0.9996582083813919
+    val:
+      accuracy: 0.9861728395061728
+      precision: 0.9868852459016394
+      recall: 0.9261538461538461
+      f1: 0.9555555555555556
+      roc_auc: 0.9988434389140272
+    test:
+      accuracy: 0.9081934846989141
+      precision: 0.7083333333333334
+      recall: 0.7300613496932515
+      f1: 0.7190332326283988
+      roc_auc: 0.9410700108264165
+- model_key: mlp
+  model_name: MLPClassifier
+  best_params:
+    activation: tanh
+    alpha: 0.0001
+    hidden_layer_sizes:
+    - 100
+    - 50
+    learning_rate_init: 0.01
+    max_iter: 200
+    solver: adam
+  scores:
+    train:
+      accuracy: 1.0
+      precision: 1.0
+      recall: 1.0
+      f1: 1.0
+      roc_auc: 1.0
+    val:
+      accuracy: 1.0
+      precision: 1.0
+      recall: 1.0
+      f1: 1.0
+      roc_auc: 1.0
+    test:
+      accuracy: 0.9081934846989141
+      precision: 0.7333333333333333
+      recall: 0.6748466257668712
+      f1: 0.7028753993610224
+      roc_auc: 0.9372013713460845
+- model_key: random_forest
+  model_name: RandomForestClassifier
+  best_params:
+    bootstrap: false
+    max_depth: 20
+    min_samples_leaf: 1
+    min_samples_split: 2
+    n_estimators: 200
+  scores:
+    train:
+      accuracy: 0.9995098039215686
+      precision: 0.9990205680705191
+      recall: 1.0
+      f1: 0.9995100440960314
+      roc_auc: 1.0
+    val:
+      accuracy: 0.9995061728395062
+      precision: 0.9969325153374233
+      recall: 1.0
+      f1: 0.9984639016897081
+      roc_auc: 1.0
+    test:
+      accuracy: 0.903751233958539
+      precision: 0.7314487632508834
+      recall: 0.6349693251533742
+      f1: 0.6798029556650246
+      roc_auc: 0.9292565860700108
+- model_key: logistic_regression
+  model_name: LogisticRegression
+  best_params:
+    C: 1.0
+    max_iter: 100
+    penalty: l2
+    solver: liblinear
+  scores:
+    train:
+      accuracy: 0.8268627450980393
+      precision: 0.8384084449857897
+      recall: 0.8098039215686275
+      f1: 0.8238579692798723
+      roc_auc: 0.9048572472126105
+    val:
+      accuracy: 0.8804938271604938
+      precision: 0.6627450980392157
+      recall: 0.52
+      f1: 0.5827586206896552
+      roc_auc: 0.8555547511312217
+    test:
+      accuracy: 0.8489634748272458
+      precision: 0.5218340611353712
+      recall: 0.7331288343558282
+      f1: 0.6096938775510204
+      roc_auc: 0.8791050162396248
