@@ -9,8 +9,8 @@ from src.Data_Preprocessing import execute_data_preprocessing
 from src.Model_Tune_Evaluate import execute_model_tune_evaluate
 from src.Data_Transformation import execute_data_transformation
 
-#MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
-#mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
+MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
+mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
 logger = setup_logger(filename="logs")
 
 @track_performance
