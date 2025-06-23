@@ -1,0 +1,163 @@
+[2025-06-23 14:03:59,746] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 14:03:59,765] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 14:03:59,774] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 14:03:59,778] 127 __init__.py - INFO - Loaded config from Config_Yaml/schema.yaml
+[2025-06-23 14:03:59,786] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 14:03:59,789] 127 __init__.py - INFO - Loaded config from Config_Yaml\schema.yaml
+[2025-06-23 14:03:59,815] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 14:03:59,881] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 14:03:59,881] 127 __init__.py - INFO - Loaded config from Config_Yaml/classifiers.yaml
+[2025-06-23 14:04:00,152] 127 __init__.py - INFO - Loaded config from Config_Yaml/config_path.yaml
+[2025-06-23 14:04:01,154] 104 __init__.py - INFO - Running 'execute_pipeline'...
+[2025-06-23 14:04:01,154] 104 __init__.py - INFO - Running 'execute_data_ingestion'...
+[2025-06-23 14:04:01,154] 113 Data_Ingestion.py - INFO - Starting Data_Ingestion process..
+[2025-06-23 14:04:01,154] 104 __init__.py - INFO - Running 'ingest'...
+[2025-06-23 14:04:01,154] 82 Data_Ingestion.py - INFO - Starting data ingestion...
+[2025-06-23 14:04:01,154] 104 __init__.py - INFO - Running 'load_dataset'...
+[2025-06-23 14:04:01,154] 180 file_reader.py - INFO - Extracting zip file: Data\raw_data\zip_files\bank_churners.zip
+[2025-06-23 14:04:01,154] 197 file_reader.py - INFO - Renamed file to: Data\raw_data\extracted_files\bank_churners.csv
+[2025-06-23 14:04:01,154] 103 file_reader.py - INFO - Using reader for extension: .csv
+[2025-06-23 14:04:01,154] 145 file_reader.py - INFO - Reading file: Data\raw_data\extracted_files\bank_churners.csv
+[2025-06-23 14:04:01,212] 147 file_reader.py - INFO - Successfully read file. Shape: (10127, 23)
+[2025-06-23 14:04:01,212] 115 __init__.py - INFO - 'load_dataset' completed in 0.0582 sec
+[2025-06-23 14:04:01,212] 116 __init__.py - INFO - Memory used: 2020.26 KB (peak: 6171.97 KB)
+[2025-06-23 14:04:01,212] 90 Data_Ingestion.py - INFO - Filtering DataFrame columns to match schema: ['CLIENTNUM', 'Attrition_Flag', 'Customer_Age', 'Gender', 'Dependent_count', 'Education_Level', 'Marital_Status', 'Income_Category', 'Card_Category', 'Months_on_book', 'Total_Relationship_Count', 'Months_Inactive_12_mon', 'Contacts_Count_12_mon', 'Credit_Limit', 'Total_Revolving_Bal', 'Avg_Open_To_Buy', 'Total_Amt_Chng_Q4_Q1', 'Total_Trans_Amt', 'Total_Trans_Ct', 'Total_Ct_Chng_Q4_Q1', 'Avg_Utilization_Ratio']
+[2025-06-23 14:04:01,279] 97 Data_Ingestion.py - INFO - Filtered DataFrame saved to: Data\raw_data\extracted_files\bank_churners.csv
+[2025-06-23 14:04:01,279] 36 sqlite_handler.py - INFO - Connected to SQLite DB at Data\data.db
+[2025-06-23 14:04:01,279] 152 sqlite_handler.py - INFO - Table 'raw_data' exists: True
+[2025-06-23 14:04:01,279] 61 Data_Ingestion.py - INFO - Table 'raw_data' exists. Overwriting...
+[2025-06-23 14:04:01,397] 114 sqlite_handler.py - INFO - Wrote DataFrame to table 'raw_data' (overwrite). Shape: (10127, 21)
+[2025-06-23 14:04:01,397] 49 sqlite_handler.py - INFO - Closed connection to SQLite DB.
+[2025-06-23 14:04:01,397] 102 Data_Ingestion.py - INFO - Data ingestion completed successfully.
+[2025-06-23 14:04:01,397] 115 __init__.py - INFO - 'ingest' completed in 0.2437 sec
+[2025-06-23 14:04:01,397] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.00 KB)
+[2025-06-23 14:04:01,397] 116 Data_Ingestion.py - INFO - Data_Ingestion completed successfully
+[2025-06-23 14:04:01,397] 115 __init__.py - INFO - 'execute_data_ingestion' completed in 0.2437 sec
+[2025-06-23 14:04:01,397] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.00 KB)
+[2025-06-23 14:04:01,397] 104 __init__.py - INFO - Running 'execute_data_validation'...
+[2025-06-23 14:04:01,397] 205 Data_Validation.py - INFO - Starting data validation pipeline...
+[2025-06-23 14:04:01,447] 104 __init__.py - INFO - Running 'run_all_checks'...
+[2025-06-23 14:04:01,447] 104 __init__.py - INFO - Running 'check_columns'...
+[2025-06-23 14:04:01,447] 56 Data_Validation.py - INFO - Checking for missing columns...
+[2025-06-23 14:04:01,447] 115 __init__.py - INFO - 'check_columns' completed in 0.0000 sec
+[2025-06-23 14:04:01,447] 116 __init__.py - INFO - Memory used: 3342.27 KB (peak: 5509.98 KB)
+[2025-06-23 14:04:01,447] 104 __init__.py - INFO - Running 'check_dtypes'...
+[2025-06-23 14:04:01,447] 68 Data_Validation.py - INFO - Checking data types...
+[2025-06-23 14:04:01,456] 115 __init__.py - INFO - 'check_dtypes' completed in 0.0090 sec
+[2025-06-23 14:04:01,456] 116 __init__.py - INFO - Memory used: 37.36 KB (peak: 114.16 KB)
+[2025-06-23 14:04:01,456] 104 __init__.py - INFO - Running 'check_missing_values'...
+[2025-06-23 14:04:01,456] 104 Data_Validation.py - INFO - Checking missing values...
+[2025-06-23 14:04:01,467] 115 __init__.py - INFO - 'check_missing_values' completed in 0.0115 sec
+[2025-06-23 14:04:01,467] 116 __init__.py - INFO - Memory used: 117.55 KB (peak: 787.20 KB)
+[2025-06-23 14:04:01,467] 104 __init__.py - INFO - Running 'check_value_ranges'...
+[2025-06-23 14:04:01,467] 131 Data_Validation.py - INFO - Checking value ranges...
+[2025-06-23 14:04:01,470] 115 __init__.py - INFO - 'check_value_ranges' completed in 0.0030 sec
+[2025-06-23 14:04:01,470] 116 __init__.py - INFO - Memory used: 10.28 KB (peak: 63.67 KB)
+[2025-06-23 14:04:01,471] 104 __init__.py - INFO - Running 'check_duplicates'...
+[2025-06-23 14:04:01,471] 160 Data_Validation.py - INFO - Checking for duplicates...
+[2025-06-23 14:04:01,482] 115 __init__.py - INFO - 'check_duplicates' completed in 0.0115 sec
+[2025-06-23 14:04:01,482] 116 __init__.py - INFO - Memory used: 16.97 KB (peak: 2089.44 KB)
+[2025-06-23 14:04:01,482] 195 Data_Validation.py - INFO - Data validation passed cleanly.
+[2025-06-23 14:04:01,482] 115 __init__.py - INFO - 'run_all_checks' completed in 0.0356 sec
+[2025-06-23 14:04:01,483] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.00 KB)
+[2025-06-23 14:04:01,483] 214 Data_Validation.py - INFO - Validation passed successfully.
+[2025-06-23 14:04:01,484] 115 __init__.py - INFO - 'execute_data_validation' completed in 0.0871 sec
+[2025-06-23 14:04:01,484] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.00 KB)
+[2025-06-23 14:04:01,484] 104 __init__.py - INFO - Running 'execute_data_preprocessing'...
+[2025-06-23 14:04:01,484] 80 Data_Preprocessing.py - INFO - Starting Data Preprocessing...
+[2025-06-23 14:04:01,487] 36 sqlite_handler.py - INFO - Connected to SQLite DB at Data\data.db
+[2025-06-23 14:04:01,615] 96 sqlite_handler.py - INFO - Executed read query. Rows fetched: 10127
+[2025-06-23 14:04:03,258] 171 Data_Preprocessing.py - INFO - Preprocessing and saving completed successfully.
+[2025-06-23 14:04:03,293] 115 __init__.py - INFO - 'execute_data_preprocessing' completed in 1.8083 sec
+[2025-06-23 14:04:03,293] 116 __init__.py - INFO - Memory used: 423.21 KB (peak: 34945.11 KB)
+[2025-06-23 14:04:03,293] 104 __init__.py - INFO - Running 'execute_data_transformation'...
+[2025-06-23 14:04:03,293] 225 Data_Transformation.py - INFO - Data Transformation execution started.
+[2025-06-23 14:04:03,293] 104 __init__.py - INFO - Running 'load_data'...
+[2025-06-23 14:04:03,397] 70 Data_Transformation.py - INFO - Data loaded successfully.
+[2025-06-23 14:04:03,397] 115 __init__.py - INFO - 'load_data' completed in 0.1048 sec
+[2025-06-23 14:04:03,397] 116 __init__.py - INFO - Memory used: 1611.83 KB (peak: 3177.52 KB)
+[2025-06-23 14:04:03,397] 104 __init__.py - INFO - Running 'encode_and_scale'...
+[2025-06-23 14:04:03,453] 101 Data_Transformation.py - INFO - Encoding and scaling completed.
+[2025-06-23 14:04:03,453] 115 __init__.py - INFO - 'encode_and_scale' completed in 0.0553 sec
+[2025-06-23 14:04:03,453] 116 __init__.py - INFO - Memory used: 1883.14 KB (peak: 2325.72 KB)
+[2025-06-23 14:04:03,453] 104 __init__.py - INFO - Running 'sample_data'...
+[2025-06-23 14:04:07,884] 136 Data_Transformation.py - INFO - Sampling completed successfully.
+[2025-06-23 14:04:07,884] 115 __init__.py - INFO - 'sample_data' completed in 4.4307 sec
+[2025-06-23 14:04:07,884] 116 __init__.py - INFO - Memory used: 2225.84 KB (peak: 4687.55 KB)
+[2025-06-23 14:04:07,884] 104 __init__.py - INFO - Running 'select_features'...
+[2025-06-23 14:04:07,918] 172 Data_Transformation.py - INFO - Feature selection applied. Selected columns: 20
+[2025-06-23 14:04:07,919] 115 __init__.py - INFO - 'select_features' completed in 0.0351 sec
+[2025-06-23 14:04:07,919] 116 __init__.py - INFO - Memory used: 2255.60 KB (peak: 6492.31 KB)
+[2025-06-23 14:04:07,919] 104 __init__.py - INFO - Running 'extract_features'...
+[2025-06-23 14:06:52,762] 207 Data_Transformation.py - INFO - Feature extraction completed successfully.
+[2025-06-23 14:06:52,782] 115 __init__.py - INFO - 'extract_features' completed in 164.8624 sec
+[2025-06-23 14:06:52,782] 116 __init__.py - INFO - Memory used: 1722.69 KB (peak: 1631633.09 KB)
+[2025-06-23 14:06:53,036] 248 Data_Transformation.py - INFO - Processed datasets saved successfully.
+[2025-06-23 14:06:53,037] 249 Data_Transformation.py - INFO - Data Transformation execution completed.
+[2025-06-23 14:06:53,037] 115 __init__.py - INFO - 'execute_data_transformation' completed in 169.7444 sec
+[2025-06-23 14:06:53,037] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.00 KB)
+[2025-06-23 14:06:53,037] 104 __init__.py - INFO - Running 'execute_model_tune_evaluate'...
+[2025-06-23 14:06:53,037] 237 Model_Tune_Evaluate.py - INFO - Starting model_tune_evaluate...
+[2025-06-23 14:06:53,170] 158 Model_Tune_Evaluate.py - INFO - Tuning: logistic_regression
+[2025-06-23 14:06:53,170] 104 __init__.py - INFO - Running 'get_model_class'...
+[2025-06-23 14:06:53,170] 115 __init__.py - INFO - 'get_model_class' completed in 0.0000 sec
+[2025-06-23 14:06:53,170] 116 __init__.py - INFO - Memory used: 1802.36 KB (peak: 2593.06 KB)
+[2025-06-23 14:06:58,249] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:06:58,284] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0331 sec
+[2025-06-23 14:06:58,284] 116 __init__.py - INFO - Memory used: 53.79 KB (peak: 1085.64 KB)
+[2025-06-23 14:06:58,284] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:06:58,301] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0170 sec
+[2025-06-23 14:06:58,301] 116 __init__.py - INFO - Memory used: 9.81 KB (peak: 222.74 KB)
+[2025-06-23 14:06:58,301] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:06:58,316] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0157 sec
+[2025-06-23 14:06:58,316] 116 __init__.py - INFO - Memory used: 9.90 KB (peak: 222.93 KB)
+[2025-06-23 14:06:58,316] 158 Model_Tune_Evaluate.py - INFO - Tuning: random_forest
+[2025-06-23 14:06:58,316] 104 __init__.py - INFO - Running 'get_model_class'...
+[2025-06-23 14:06:58,316] 115 __init__.py - INFO - 'get_model_class' completed in 0.0000 sec
+[2025-06-23 14:06:58,316] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.29 KB)
+[2025-06-23 14:07:55,247] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:07:55,711] 115 __init__.py - INFO - 'evaluate_score' completed in 0.4641 sec
+[2025-06-23 14:07:55,712] 116 __init__.py - INFO - Memory used: 25.32 KB (peak: 1099.07 KB)
+[2025-06-23 14:07:55,712] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:07:55,865] 115 __init__.py - INFO - 'evaluate_score' completed in 0.1529 sec
+[2025-06-23 14:07:55,865] 116 __init__.py - INFO - Memory used: 23.26 KB (peak: 235.91 KB)
+[2025-06-23 14:07:55,865] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:07:56,047] 115 __init__.py - INFO - 'evaluate_score' completed in 0.1827 sec
+[2025-06-23 14:07:56,047] 116 __init__.py - INFO - Memory used: 27.05 KB (peak: 240.14 KB)
+[2025-06-23 14:07:56,047] 158 Model_Tune_Evaluate.py - INFO - Tuning: xgboost
+[2025-06-23 14:07:56,047] 104 __init__.py - INFO - Running 'get_model_class'...
+[2025-06-23 14:07:56,047] 115 __init__.py - INFO - 'get_model_class' completed in 0.0000 sec
+[2025-06-23 14:07:56,047] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.29 KB)
+[2025-06-23 14:09:17,210] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:09:17,254] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0441 sec
+[2025-06-23 14:09:17,254] 116 __init__.py - INFO - Memory used: 28.27 KB (peak: 939.79 KB)
+[2025-06-23 14:09:17,254] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:09:17,291] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0365 sec
+[2025-06-23 14:09:17,291] 116 __init__.py - INFO - Memory used: 39.60 KB (peak: 228.57 KB)
+[2025-06-23 14:09:17,291] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:09:17,329] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0380 sec
+[2025-06-23 14:09:17,329] 116 __init__.py - INFO - Memory used: 32.30 KB (peak: 221.62 KB)
+[2025-06-23 14:09:17,331] 155 Model_Tune_Evaluate.py - INFO - Skipping model 'svc' (not allowed)
+[2025-06-23 14:09:17,331] 158 Model_Tune_Evaluate.py - INFO - Tuning: mlp
+[2025-06-23 14:09:17,331] 104 __init__.py - INFO - Running 'get_model_class'...
+[2025-06-23 14:09:17,331] 115 __init__.py - INFO - 'get_model_class' completed in 0.0000 sec
+[2025-06-23 14:09:17,331] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.29 KB)
+[2025-06-23 14:11:56,943] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:11:57,006] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0628 sec
+[2025-06-23 14:11:57,006] 116 __init__.py - INFO - Memory used: 9.83 KB (peak: 12035.36 KB)
+[2025-06-23 14:11:57,006] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:11:57,046] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0399 sec
+[2025-06-23 14:11:57,046] 116 __init__.py - INFO - Memory used: 6.42 KB (peak: 2390.49 KB)
+[2025-06-23 14:11:57,046] 104 __init__.py - INFO - Running 'evaluate_score'...
+[2025-06-23 14:11:57,073] 115 __init__.py - INFO - 'evaluate_score' completed in 0.0276 sec
+[2025-06-23 14:11:57,073] 116 __init__.py - INFO - Memory used: 6.63 KB (peak: 2391.27 KB)
+[2025-06-23 14:11:57,088] 220 Model_Tune_Evaluate.py - INFO - Summary saved to: Config_Yaml\tuned_models.yaml
+[2025-06-23 14:11:57,090] 257 Model_Tune_Evaluate.py - INFO - model_tune_evaluate completed.
+[2025-06-23 14:11:57,090] 115 __init__.py - INFO - 'execute_model_tune_evaluate' completed in 304.0530 sec
+[2025-06-23 14:11:57,091] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.00 KB)
+[2025-06-23 14:11:57,091] 104 __init__.py - INFO - Running 'execute_mlflow_steps'...
+[2025-06-23 14:11:57,149] 127 __init__.py - INFO - Loaded config from Config_Yaml\tuned_models.yaml
+[2025-06-23 14:11:59,995] 115 __init__.py - INFO - 'execute_mlflow_steps' completed in 2.9039 sec
+[2025-06-23 14:11:59,995] 116 __init__.py - INFO - Memory used: 2548.56 KB (peak: 7520.59 KB)
+[2025-06-23 14:11:59,996] 115 __init__.py - INFO - 'execute_pipeline' completed in 478.8424 sec
+[2025-06-23 14:11:59,996] 116 __init__.py - INFO - Memory used: 0.00 KB (peak: 0.00 KB)
