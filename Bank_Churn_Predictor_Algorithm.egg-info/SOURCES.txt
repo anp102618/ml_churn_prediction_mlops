@@ -32,6 +32,5 @@ src/Data_Preprocessing.py
 src/Data_Transformation.py
 src/Data_Validation.py
 src/Experiment_Tracking_Prediction.py
-src/Model_Tune_Evaluate.py
-src/Model_tune_evaluate.py
+src/Model_Tuning_Evaluate.py
 src/__init__.py

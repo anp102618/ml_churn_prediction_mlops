@@ -7,7 +7,7 @@ from Common_Utils import setup_logger, track_performance, CustomException
 from src.Data_Ingestion import execute_data_ingestion
 from src.Data_Validation import execute_data_validation
 from src.Data_Preprocessing import execute_data_preprocessing
-from src.Model_Tune_Evaluate import execute_model_tune_evaluate
+from src.Model_Tuning_Evaluate import execute_model_tune_evaluate
 from src.Data_Transformation import execute_data_transformation
 
 MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
