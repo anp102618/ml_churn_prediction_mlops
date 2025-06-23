@@ -1,6 +1,0 @@
-# Python
-__pycache__/
-*.py[cod]
-*.ipynb_checkpoints/
-*.egg-info/# Add patterns of files dvc should ignore, which could improve
-
