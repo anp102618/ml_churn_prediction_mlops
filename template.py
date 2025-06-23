@@ -11,6 +11,7 @@ list_of_files = [
     ".gitignore",
     f"Common_Utils/__init__.py",
     f"Common_Utils/file_reader.py",
+    f"Common_Utils/file_copy.py",
     f"Common_Utils/sqlite_handler.py",
     f"Common_Utils/dataframe_methods.py",
     
@@ -21,6 +22,7 @@ list_of_files = [
     f"Data/data.db",
     f"Data/raw_data/__init__.py",
     f"Data/processed_data/__init__.py",
+    f"Data/ref_data/__init__.py",
 
     f"Tuned_Model/__init__.py",
     
@@ -47,6 +49,7 @@ list_of_files = [
     f"src/Experiment_Tracking_Prediction.py",
 
     f"Tuned_Model/__init__.py",
+    f"Tuned_Model/prediction.py",
 
     f"Test_Script/__init__.py",
     f"Test_Script/test_model_promotion.py",
@@ -65,7 +68,6 @@ list_of_files = [
     "app_requirements.txt",
     "setup.py",
     "main.py",
-    "streamlit_app.py",
     "Dockerfile",
     ".dockerignore",
     

@@ -24,6 +24,7 @@ Model_Utils/feature_selection_extraction.py
 Test_Script/__init__.py
 Test_Script/test_model_promotion.py
 Tuned_Model/__init__.py
+Tuned_Model/prediction.py
 src/Data_Ingestion.py
 src/Data_Preprocessing.py
 src/Data_Transformation.py

@@ -16,6 +16,7 @@ mlflow_run:
   model_uri: runs:/c40713dc054d4509bc046efa15184703/model
   run_id: c40713dc054d4509bc046efa15184703
   run_name: XGBClassifier_20250623_1411
+  stage: production
   start_time: 1750668118767
   status: RUNNING
   tracking_uri: https://dagshub.com/anp102618/ml_churn_prediction_mlops.mlflow

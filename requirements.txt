@@ -4,6 +4,7 @@ matplotlib
 python-box==6.0.2
 pyYAML
 tqdm
+pydantic
 ensure==1.0.2
 joblib
 types-PyYAML

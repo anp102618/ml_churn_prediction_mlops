@@ -1,0 +1,5 @@
+[2025-06-23 14:41:40,032] 127 __init__.py - INFO - Loaded config from Tuned_Model/mlflow_details.yaml
+[2025-06-23 14:41:40,032] 28 test_model_promotion.py - INFO - TRAIN - Accuracy: 0.9962745098039215, ROC AUC: 0.9962745098039216
+[2025-06-23 14:41:40,032] 28 test_model_promotion.py - INFO - VAL - Accuracy: 0.9758024691358025, ROC AUC: 0.9407918552036199
+[2025-06-23 14:41:40,032] 28 test_model_promotion.py - INFO - TEST - Accuracy: 0.9027640671273445, ROC AUC: 0.8193359797906893
+[2025-06-23 14:41:40,032] 38 test_model_promotion.py - INFO - All metrics passed. Promoting model.

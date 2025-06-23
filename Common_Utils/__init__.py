@@ -200,7 +200,7 @@ def copy_yaml_file(source_file: str, destination_folder: str):
         print(f"Error copying YAML: {e}")
 
 # ------------------ Copy All Joblib Files ------------------ #
-def copy_selected_files(source_folder: str, destination_folder: str, extensions=(".joblib", ".yaml")):
+def copy_selected_files1(source_folder: str, destination_folder: str, extensions=(".joblib", ".yaml")):
     logger = setup_logger(filename="logs")
     try:
         src_folder = Path(source_folder)
@@ -226,7 +226,7 @@ def copy_selected_files(source_folder: str, destination_folder: str, extensions=
         print(f"Error copying files: {e}")
 
 
-def copy_selected_files1(source_dir: str, destination_dir: str, file_types: List[str]) -> None:
+def copy_selected_files(source_dir: str, destination_dir: str, file_types: List[str]) -> None:
    
     if not os.path.exists(source_dir):
         raise ValueError(f"Source directory does not exist: {source_dir}")

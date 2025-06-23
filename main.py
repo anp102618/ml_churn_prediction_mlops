@@ -8,7 +8,6 @@ from src.Data_Validation import execute_data_validation
 from src.Data_Preprocessing import execute_data_preprocessing
 from src.Model_Tune_Evaluate import execute_model_tune_evaluate
 from src.Data_Transformation import execute_data_transformation
-from src.Experiment_Tracking_Prediction import execute_mlflow_steps
 
 #MLFLOW_TRACKING_URI = os.environ.get("MLFLOW_TRACKING_URI")
 #mlflow.set_tracking_uri(MLFLOW_TRACKING_URI)
@@ -24,7 +23,7 @@ def execute_pipeline():
         execute_data_preprocessing()
         execute_data_transformation()
         execute_model_tune_evaluate()
-        execute_mlflow_steps()
+    
         
         logger.info("End to End ML pipeline execution completed successfully...")
 
