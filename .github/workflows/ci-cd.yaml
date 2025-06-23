@@ -39,7 +39,10 @@ jobs:
           pip install -r requirements.txt || true  # in case some extras overlap
 
       - name: Set PYTHONPATH
-        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)" >> $GITHUB_ENV
+        run: echo "PYTHONPATH=$PYTHONPATH:$(pwd)/src" >> $GITHUB_ENV
+
+      - name: Ensure __init__.py exists
+        run: touch src/__init__.py
 
       - name: Run Model Training
         run: python main.py
